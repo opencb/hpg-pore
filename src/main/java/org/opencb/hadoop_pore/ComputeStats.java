@@ -33,18 +33,18 @@ public class ComputeStats  extends Configured implements Tool {
 			System.out.println("-----> loading libs..");
 			//System.load(new File("/tmp/libnativefast5.so").getAbsolutePath());
 			String hostname;
-			File fast5Lib = new File("/tmp/libopencb_pore.so");
+			File poreLib = new File("/tmp/libopencb_pore.so");
 			try {
 				hostname = InetAddress.getLocalHost().getHostName();
 			} catch (UnknownHostException e) {
 				hostname = new String("no-name");
 			}
-			if (fast5Lib.exists()) {
-				System.out.println("*********** " + fast5Lib.getAbsolutePath() + " exists (" + hostname + ")");
+			if (poreLib.exists()) {
+				System.out.println("*********** " + poreLib.getAbsolutePath() + " exists (" + hostname + ")");
 			} else {
-				System.out.println("*********** " + fast5Lib.getAbsolutePath() + " does NOT exist (" + hostname + ")");				
+				System.out.println("*********** " + poreLib.getAbsolutePath() + " does NOT exist (" + hostname + ")");				
 			}
-			System.load(fast5Lib.getAbsolutePath());
+			System.load(poreLib.getAbsolutePath());
 		}
 
 		@Override
@@ -54,8 +54,9 @@ public class ComputeStats  extends Configured implements Tool {
 
 			String info = new NativePoreSupport().getInfo(value.getBytes());
 			StatsWritable finalStats = new StatsWritable();
-
+			
 			if (info != null) {
+				System.out.println(info);
 				/*
 				String[] lines = fastqs.split("\n");
 				for (int i = 1; i < lines.length; i+=4) {

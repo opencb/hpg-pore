@@ -262,7 +262,8 @@ char *get_info(char *file_image, int file_size) {
     return NULL;
   }
 
-  char info[8092] = "";
+  size_t alloc_info_size = 8092;
+  char *info = (char *) calloc(alloc_info_size, sizeof(char));
 
   // commons attributes
   concat_string_attr(fid, "/Analyses/Basecall_2D_000", "name", info);
@@ -281,42 +282,54 @@ char *get_info(char *file_image, int file_size) {
   concat_string_attr(fid, "/UniqueGlobalKey/tracking_id", "run_id", info);
   concat_string_attr(fid, "/UniqueGlobalKey/tracking_id", "version_name", info);
 
-  size_t dataset_size;
-  char *fastq;
+  size_t size_te, size_co, size_2d;
+  char *fastq_te, *fastq_co, *fastq_2d;
+
+  fastq_te = get_dataset(fid, "/Analyses/Basecall_2D_000/BaseCalled_template/Fastq", &size_te);
+  fastq_co = get_dataset(fid, "/Analyses/Basecall_2D_000/BaseCalled_complement/Fastq", &size_co);
+  fastq_2d = get_dataset(fid, "/Analyses/Basecall_2D_000/BaseCalled_2D/Fastq", &size_2d);
+
+  size_t info_size = strlen(info);
+  size_t aux = (size_te + size_co + size_2d) / 2;
+
+  if (info_size + aux >= alloc_info_size) {
+    alloc_info_size = info_size + aux + 512;
+    char *aux = (char *) calloc(alloc_info_size, sizeof(char));
+    memcpy(aux, info, info_size);
+    free(info);
+    info = aux;
+  }
 
   // template
-  fastq = get_dataset(fid, "/Analyses/Basecall_2D_000/BaseCalled_template/Fastq", &dataset_size);
-  if (fastq) {
+  if (fastq_te) {
     concat_string("-te", "", info);
     concat_float_attr(fid, "/Analyses/Basecall_2D_000/Summary/basecall_1d_template", "mean_qscore", info);
     concat_int_attr(fid, "/Analyses/Basecall_2D_000/Summary/basecall_1d_template", "called_events", info);
     concat_int_attr(fid, "/Analyses/Basecall_2D_000/Summary/basecall_1d_template", "num_events", info);
 
-    concat_seq_values(fastq, info);
-    if (fastq) free(fastq);
+    concat_seq_values(fastq_te, info);
+    free(fastq_te);
   }
   
   // complement
-  fastq = get_dataset(fid, "/Analyses/Basecall_2D_000/BaseCalled_complement/Fastq", &dataset_size);
-  if (fastq) {
-    concat_string("-", "complement", info);
+  if (fastq_co) {
+    concat_string("-co", "", info);
     concat_float_attr(fid, "/Analyses/Basecall_2D_000/Summary/basecall_1d_complement", "mean_qscore", info);
     concat_int_attr(fid, "/Analyses/Basecall_2D_000/Summary/basecall_1d_complement", "called_events", info);
     concat_int_attr(fid, "/Analyses/Basecall_2D_000/Summary/basecall_1d_complement", "num_events", info);
 
-    concat_seq_values(fastq, info);
-    if (fastq) free(fastq);
+    concat_seq_values(fastq_co, info);
+    free(fastq_co);
   }
 
   // 2D
-  fastq = get_dataset(fid, "/Analyses/Basecall_2D_000/BaseCalled_2D/Fastq", &dataset_size);
-  if (fastq) {
-    concat_string("-", "2d", info);
+  if (fastq_2d) {
+    concat_string("-2d", "", info);
     concat_float_attr(fid, "/Analyses/Basecall_2D_000/Summary/basecall_2d", "mean_qscore", info);
     concat_int_attr(fid, "/Analyses/Basecall_2D_000/Summary/basecall_2d", "sequence_length", info);
 
-    concat_seq_values(fastq, info);
-    if (fastq) free(fastq);
+    concat_seq_values(fastq_2d, info);
+    free(fastq_2d);
   }
 
   return info;
