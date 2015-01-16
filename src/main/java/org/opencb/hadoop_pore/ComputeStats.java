@@ -24,6 +24,10 @@ import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.data.category.DefaultCategoryDataset;
 
 public class ComputeStats  extends Configured implements Tool {
 
@@ -194,9 +198,6 @@ public class ComputeStats  extends Configured implements Tool {
 		Path outFile = new Path(args[2] + "/part-r-00000");
 		System.out.println("out file = " + outFile.getName());
 
-
-
-
 		if (!fs.exists(outFile)) {
 			System.out.println("out file = " + outFile.getName() + " does not exist !!");
 		} else {
@@ -211,8 +212,10 @@ public class ComputeStats  extends Configured implements Tool {
 			String line, runId;
 			String[] fields;
 
-			HistogramGraph graph;
+			JFreeChart chart;
 			HashMap<Integer, Integer> hist;
+			int width = 1024;
+			int height = 480;
 
 			BufferedReader in = new BufferedReader(new FileReader(new File(outRawFilename)));
 
@@ -239,8 +242,8 @@ public class ComputeStats  extends Configured implements Tool {
 						fields = line.split("\t");
 						hist.put(Integer.valueOf(fields[0]), Integer.valueOf(fields[1]));
 					}
-					graph = new HistogramGraph(hist);
-					graph.save(outLocalDir + "/" + runId + "_channel_reads.png");
+					chart = Utils.plotChannelChart(hist, "Number of reads per channel", "reads");
+					Utils.saveChart(chart, width, height, outLocalDir + "/" + runId + "_channel_reads.jpg");
 				}
 
 				// skip
@@ -257,8 +260,8 @@ public class ComputeStats  extends Configured implements Tool {
 						fields = line.split("\t");
 						hist.put(Integer.valueOf(fields[0]), Integer.valueOf(fields[1]));
 					}
-					graph = new HistogramGraph(hist);
-					graph.save(outLocalDir + "/" + runId + "_channel_yield.png");
+					chart = Utils.plotChannelChart(hist, "Yield per channel", "yield (nucleotides)");
+					Utils.saveChart(chart, width, height, outLocalDir + "/" + runId + "_channel_yield.jpg");
 				}
 
 				for (int j = 0; j < 3; j++) {
@@ -280,7 +283,7 @@ public class ComputeStats  extends Configured implements Tool {
 					line = in.readLine();
 					int numSeqs = Integer.parseInt(line);
 					writer.println("\tNum. seqs: " + numSeqs);
-					
+
 					// total length
 					line = in.readLine();
 					int totalLength = Integer.parseInt(line);
@@ -292,7 +295,7 @@ public class ComputeStats  extends Configured implements Tool {
 					line = in.readLine();
 					value = Integer.parseInt(line);
 					writer.println("\tMin. read length: " + value);
-					
+
 					// max read length
 					line = in.readLine();
 					value = Integer.parseInt(line);
@@ -300,17 +303,17 @@ public class ComputeStats  extends Configured implements Tool {
 
 					writer.println();
 					writer.println("\tNucleotides content:");
-					
+
 					// A
 					line = in.readLine();
 					value = Integer.parseInt(line);
 					writer.println("\t\tA: " + value + " (" + (100.0f * value / totalLength) + " %)");
-					
+
 					// T
 					line = in.readLine();
 					value = Integer.parseInt(line);
 					writer.println("\t\tT: " + value + " (" + (100.0f * value / totalLength) + " %)");
-					
+
 					// G
 					line = in.readLine();
 					value = Integer.parseInt(line);
@@ -322,12 +325,12 @@ public class ComputeStats  extends Configured implements Tool {
 					value = Integer.parseInt(line);
 					writer.println("\t\tC: " + value + " (" + (100.0f * value / totalLength) + " %)");
 					numGC += value;
-					
+
 					// N
 					line = in.readLine();
 					value = Integer.parseInt(line);
 					writer.println("\t\tN: " + value + " (" + (100.0f * value / totalLength) + " %)");
-					
+
 					writer.println();
 					writer.println("\t\tGC: " + (100.0f * numGC / totalLength) + " %");
 
@@ -342,10 +345,10 @@ public class ComputeStats  extends Configured implements Tool {
 							fields = line.split("\t");
 							hist.put(Integer.valueOf(fields[0]), Integer.valueOf(fields[1]));
 						}
-						graph = new HistogramGraph(hist);
-						graph.save(outLocalDir + "/" + runId + "_" + label + "_read_length.png");
+						chart = Utils.plotHistogram(hist, "Read length histogram (" + label + ")", "read length", "frequency");
+						Utils.saveChart(chart, width, height, outLocalDir + "/" + runId + "_" + label + "_read_length.jpg");
 					}
-					
+
 					// plot: time vs yield
 					hist = new HashMap<Integer, Integer>();
 
@@ -357,8 +360,8 @@ public class ComputeStats  extends Configured implements Tool {
 							fields = line.split("\t");
 							hist.put(Integer.valueOf(fields[0]), Integer.valueOf(fields[1]));
 						}
-						//graph = new HistogramGraph(hist);
-						//graph.save(outLocalDir + "/" + runId + "_" + label + "_yield.png");
+						chart = Utils.plotCumulativeChart(hist, "Cumulative yield (" + label + ")", "time (seconds)", "yield (cumulative nucleotides)");
+						Utils.saveChart(chart, width, height, outLocalDir + "/" + runId + "_" + label + "_yield.jpg");
 					}
 				}
 
