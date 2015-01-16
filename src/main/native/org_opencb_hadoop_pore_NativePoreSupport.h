@@ -23,6 +23,15 @@ JNIEXPORT jstring JNICALL Java_org_opencb_hadoop_1pore_NativePoreSupport_getFast
 JNIEXPORT jstring JNICALL Java_org_opencb_hadoop_1pore_NativePoreSupport_getInfo
   (JNIEnv *, jobject, jbyteArray);
 
+/*
+ * Class:     org_opencb_hadoop_pore_NativePoreSupport
+ * Method:    getEvents
+ * Signature: ([BLjava/lang/String;II)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_org_opencb_hadoop_1pore_NativePoreSupport_getEvents
+  (JNIEnv *, jobject, jbyteArray, jstring, jint, jint);
+
+
 #ifdef __cplusplus
 }
 #endif

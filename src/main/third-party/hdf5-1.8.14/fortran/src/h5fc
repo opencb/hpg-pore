@@ -24,7 +24,7 @@
 ## then modify them accordingly to represent the new paths.               ##
 ##                                                                        ##
 ############################################################################
-prefix="/home/jtarraga/appl-new-opencb-clinic11/hdf5/hdf5-1.8.14/hdf5"
+prefix="/home/sgallego/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/hdf5"
 exec_prefix="${prefix}"
 libdir="${exec_prefix}/lib"
 includedir="${prefix}/include"
@@ -88,8 +88,8 @@ FLINKERBASE="no"
 H5BLD_FCFLAGS=" "
 F9XMODFLAG=""
 F9XSUFFIXFLAG=""
-H5BLD_LDFLAGS=" -L/home/jtarraga/appl-new-opencb-clinic11/hdf5/hdf5-1.8.14/hdf5/lib "
-H5BLD_LIBS=" -lz -lrt -ldl -lm "
+H5BLD_LDFLAGS=" -L/home/sgallego/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/hdf5/lib "
+H5BLD_LIBS=" -lz -ldl -lm "
 
 FC="${HDF5_FC:-$FCBASE}"
 FLINKER="${HDF5_FLINKER:-$FLINKERBASE}"

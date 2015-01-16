@@ -20,14 +20,9 @@ int main(int argc, char *argv[]) {
   fread(buffer, file_size, 1, f);
   fclose(f);
 
-  printf("calling get_fastqs:\n");
-  char *res = get_fastqs(buffer, file_size);
-  printf("%s\n-- get_fastqs done.\n", res);
-  
-  printf("calling get_info:\n");
-  res = get_info(buffer, file_size);
-  printf("%s\n--- get_info done.\n", res);
-
+  printf("calling get_events:\n");
+  char *res = get_events(buffer, file_size, "template", 0, 0);
+  //printf("%s\n-- get_events done.\n", res);
 
 
   printf("Done.\n");
