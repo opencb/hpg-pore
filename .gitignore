@@ -4,3 +4,4 @@
 *.la
 *.so
 *~
+/target
