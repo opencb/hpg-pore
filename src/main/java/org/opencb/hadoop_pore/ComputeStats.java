@@ -1,18 +1,18 @@
 package org.opencb.hadoop_pore;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.sql.Timestamp;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.Text;
@@ -53,49 +53,67 @@ public class ComputeStats  extends Configured implements Tool {
 			System.out.println("***** map: key = " + key);
 
 			String info = new NativePoreSupport().getInfo(value.getBytes());
-			StatsWritable finalStats = new StatsWritable();
-			
+
+			Text runId = new Text("run-id-unknown");
+			StatsWritable stats = new StatsWritable();
+
+			long startTime = -1;
+			int i, index, channel = -1;
+
 			if (info != null) {
-				System.out.println(info);
-				/*
-				String[] lines = fastqs.split("\n");
-				for (int i = 1; i < lines.length; i+=4) {
-					StatsWritable stats = new StatsWritable();
-					char[] sequence = lines[i].toCharArray();
-					stats.minSeqLength = sequence.length;
-					stats.accSeqLength = sequence.length;
-					stats.maxSeqLength = sequence.length;
-					stats.lengthMap.put(sequence.length, 1);
-					for (char nt: sequence) {
-						switch (nt) {
-						case 'A':
-						case 'a':
-							stats.numA++;
-							break;
-						case 'T':
-						case 't':
-							stats.numT++;
-							break;
-						case 'G':
-						case 'g':
-							stats.numG++;
-							break;
-						case 'C':
-						case 'c':
-							stats.numC++;
-							break;
-						case 'N':
-						case 'n':
-							stats.numN++;
-							break;
-						}
+				String v;
+				String[] fields;
+				String[] lines = info.split("\n");
+
+				// time_stamp
+				v = lines[1].split("\t")[1];
+				if (!v.isEmpty()) {
+					try {
+						startTime = Utils.date2seconds(v);
+					} catch (ParseException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+						startTime = -1;
 					}
-					finalStats.update(stats);
 				}
-				 */
+
+				// channel
+				v = lines[3].split("\t")[1];
+				if (!v.isEmpty()) {
+					channel = Integer.valueOf(v);
+				}
+
+				// run id
+				v = lines[11].split("\t")[1];
+				if (!v.isEmpty()) {
+					runId = new Text("run-id-" + v);
+				}
+
+				// template, complement and 2D
+				index = 13;
+				for (i = index; i < lines.length; i++) {
+					v = lines[i].split("\t")[0];
+					if (v.equalsIgnoreCase("-te")) {
+						Utils.setStatsByInfo(lines, i+4, startTime, stats.sTemplate);
+					} else if (v.equalsIgnoreCase("-co")) {
+						Utils.setStatsByInfo(lines, i+4, startTime, stats.sComplement);
+					} else if (v.equalsIgnoreCase("-2d")) {
+						Utils.setStatsByInfo(lines, i+3, startTime, stats.s2D);
+					}
+				}
+
+				long num_nt = stats.sTemplate.maxSeqLength + stats.sComplement.maxSeqLength + stats.s2D.maxSeqLength;
+
+				if (num_nt > 0) {
+					// update maps for channel
+					stats.rChannelMap.put(channel, 1);
+					stats.yChannelMap.put(channel, num_nt);
+				}
+
 			}
-			System.out.println("+++++ from map: stats:\n" + finalStats.toString());
-			context.write(new Text("hello"), finalStats);
+			System.out.println("(start time, channel, run id) = (" + startTime + ", " + channel + ", " + runId + ")");
+			System.out.println("+++++ from map: stats:\n" + stats.toString());
+			context.write(runId, stats);
 		}
 	}
 
@@ -105,7 +123,7 @@ public class ComputeStats  extends Configured implements Tool {
 			StatsWritable finalStats = new StatsWritable();
 
 			for (StatsWritable stat: values) {
-				//finalStats.update(stat);
+				finalStats.update(stat);
 			}
 
 			System.out.println("+++++ from combine: stats:\n" + finalStats.toString());
@@ -121,7 +139,7 @@ public class ComputeStats  extends Configured implements Tool {
 			StatsWritable finalStats = new StatsWritable();
 
 			for (StatsWritable stat: values) {
-				//finalStats.update(stat);
+				finalStats.update(stat);
 			}
 
 			Text res = new Text(finalStats.toFormat());
@@ -162,49 +180,204 @@ public class ComputeStats  extends Configured implements Tool {
 
 	public static void compute(String[] args) throws Exception {	
 
-/*
-		try {  
-			String str_date = "2014-08-25 05:49:51";
-			//String str_date="11-June-07";
-			DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			Date date = (Date) formatter.parse(str_date); 
-			long seconds1 = date.getTime() / 1000;
-
-			str_date = "2014-08-25 05:51:51";
-			formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			date = (Date) formatter.parse(str_date); 
-			long seconds2 = date.getTime() / 1000;
-			
-			System.out.println(seconds2 + " - " + seconds1 + " = " + (seconds2 - seconds1));
-		} catch (ParseException e)	{
-			System.out.println("Exception :" + e);  
-		}  
-
-		System.exit(0);
-*/
 		if (args.length != 3) {
 			System.out.println("Error: Mismatch parameters for stats command");
-			importHelp();
+			statsHelp();
 			System.exit(0);
 		}
 
 		int ecode = ToolRunner.run(new ComputeStats(), args);
 
-		HashMap<Integer, Integer> hist = new HashMap<Integer, Integer>();
-		hist.put(100, 3);
-		hist.put(150, 5);
-		hist.put(20, 1);
-		hist.put(120, 5);
-		hist.put(110, 10);
+		Configuration conf = new Configuration();
+		FileSystem fs = FileSystem.get(conf);
 
-		HistogramGraph graph = new HistogramGraph(hist);
-		graph.save("/tmp/lentgh_hist.png");
+		Path outFile = new Path(args[2] + "/part-r-00000");
+		System.out.println("out file = " + outFile.getName());
+
+
+
+
+		if (!fs.exists(outFile)) {
+			System.out.println("out file = " + outFile.getName() + " does not exist !!");
+		} else {
+			String outLocalDir = "/tmp/pore";
+			String outRawFilename = outLocalDir + "/raw.txt";
+			fs.copyToLocalFile(outFile, new Path(outRawFilename));
+
+
+			PrintWriter writer = new PrintWriter(outLocalDir + "/summary.txt", "UTF-8");
+
+			int i, value;
+			String line, runId;
+			String[] fields;
+
+			HistogramGraph graph;
+			HashMap<Integer, Integer> hist;
+
+			BufferedReader in = new BufferedReader(new FileReader(new File(outRawFilename)));
+
+			while (true) {
+				// run id	
+				line = in.readLine();
+				fields = line.split("\t");
+				runId = fields[0].substring(7);
+				writer.println("-----------------------------------------------------------------------");
+				writer.println(" Statistics for run " + runId);
+				writer.println("-----------------------------------------------------------------------");
+
+				// skip
+				in.readLine();
+
+				// plot: channel vs num. reads
+				hist = new HashMap<Integer, Integer>();
+
+				line = in.readLine();
+				value = Integer.parseInt(line);
+				if (value > 0) {
+					for (i = 0; i < value; i++) {
+						line = in.readLine();
+						fields = line.split("\t");
+						hist.put(Integer.valueOf(fields[0]), Integer.valueOf(fields[1]));
+					}
+					graph = new HistogramGraph(hist);
+					graph.save(outLocalDir + "/" + runId + "_channel_reads.png");
+				}
+
+				// skip
+				in.readLine();
+
+				// plot: channel vs yield
+				hist = new HashMap<Integer, Integer>();
+
+				line = in.readLine();
+				value = Integer.parseInt(line);
+				if (value > 0) {
+					for (i = 0; i < value; i++) {
+						line = in.readLine();
+						fields = line.split("\t");
+						hist.put(Integer.valueOf(fields[0]), Integer.valueOf(fields[1]));
+					}
+					graph = new HistogramGraph(hist);
+					graph.save(outLocalDir + "/" + runId + "_channel_yield.png");
+				}
+
+				for (int j = 0; j < 3; j++) {
+					String label = null;
+					line = in.readLine();
+					fields = line.split("\t");
+					if (fields[0].equalsIgnoreCase("-te")) {
+						label = new String("template");
+						writer.println("\nTemplate:");
+					} else if (fields[0].equalsIgnoreCase("-co")) {
+						label = new String("complement");
+						writer.println("\nComplement:");					
+					} else if (fields[0].equalsIgnoreCase("-2d")) {
+						label = new String("2d");
+						writer.println("\n2D:");
+					}
+
+					// num. seqs
+					line = in.readLine();
+					int numSeqs = Integer.parseInt(line);
+					writer.println("\tNum. seqs: " + numSeqs);
+					
+					// total length
+					line = in.readLine();
+					int totalLength = Integer.parseInt(line);
+					writer.println("\tNum. nucleotides: " + totalLength);
+					writer.println();
+					writer.println("\tMean read length: " + totalLength / numSeqs);
+
+					// min read length
+					line = in.readLine();
+					value = Integer.parseInt(line);
+					writer.println("\tMin. read length: " + value);
+					
+					// max read length
+					line = in.readLine();
+					value = Integer.parseInt(line);
+					writer.println("\tMax. read length: " + value);
+
+					writer.println();
+					writer.println("\tNucleotides content:");
+					
+					// A
+					line = in.readLine();
+					value = Integer.parseInt(line);
+					writer.println("\t\tA: " + value + " (" + (100.0f * value / totalLength) + " %)");
+					
+					// T
+					line = in.readLine();
+					value = Integer.parseInt(line);
+					writer.println("\t\tT: " + value + " (" + (100.0f * value / totalLength) + " %)");
+					
+					// G
+					line = in.readLine();
+					value = Integer.parseInt(line);
+					writer.println("\t\tG: " + value + " (" + (100.0f * value / totalLength) + " %)");
+					int numGC = value;
+
+					// C
+					line = in.readLine();
+					value = Integer.parseInt(line);
+					writer.println("\t\tC: " + value + " (" + (100.0f * value / totalLength) + " %)");
+					numGC += value;
+					
+					// N
+					line = in.readLine();
+					value = Integer.parseInt(line);
+					writer.println("\t\tN: " + value + " (" + (100.0f * value / totalLength) + " %)");
+					
+					writer.println();
+					writer.println("\t\tGC: " + (100.0f * numGC / totalLength) + " %");
+
+					// plot: read length vs frequency
+					hist = new HashMap<Integer, Integer>();
+
+					line = in.readLine();
+					value = Integer.parseInt(line);
+					if (value > 0) {
+						for (i = 0; i < value; i++) {
+							line = in.readLine();
+							fields = line.split("\t");
+							hist.put(Integer.valueOf(fields[0]), Integer.valueOf(fields[1]));
+						}
+						graph = new HistogramGraph(hist);
+						graph.save(outLocalDir + "/" + runId + "_" + label + "_read_length.png");
+					}
+					
+					// plot: time vs yield
+					hist = new HashMap<Integer, Integer>();
+
+					line = in.readLine();
+					value = Integer.parseInt(line);
+					if (value > 0) {
+						for (i = 0; i < value; i++) {
+							line = in.readLine();
+							fields = line.split("\t");
+							hist.put(Integer.valueOf(fields[0]), Integer.valueOf(fields[1]));
+						}
+						//graph = new HistogramGraph(hist);
+						//graph.save(outLocalDir + "/" + runId + "_" + label + "_yield.png");
+					}
+				}
+
+				break;
+			}
+			in.close();
+			writer.close();
+		}
+
+
+
+		//		HistogramGraph graph = new HistogramGraph(hist);
+		//		graph.save("/tmp/lentgh_hist.png");
 
 	}
 
 	//-----------------------------------------------------------------------//
 
-	public static void importHelp() {
+	public static void statsHelp() {
 		System.out.println("compute-stats command:");
 		System.out.println("\thadoop jar hadoop-nano.jar compute-stats <source> <destination>");
 		System.out.println("Options:");

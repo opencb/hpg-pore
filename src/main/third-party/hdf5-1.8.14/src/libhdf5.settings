@@ -38,8 +38,21 @@ Compiling Options:
 Languages:
 ----------
                         Fortran: no
+#               Fortran Compiler: no
+#          Fortran 2003 Compiler: 
+#                  Fortran Flags: 
+#               H5 Fortran Flags:  
+#               AM Fortran Flags: 
+#         Shared Fortran Library: no
+#         Static Fortran Library: yes
 
                             C++: no
+#                   C++ Compiler: no
+#                      C++ Flags: 
+#                   H5 C++ Flags:  
+#                   AM C++ Flags: 
+#             Shared C++ Library: no
+#             Static C++ Library: yes
 
 Features:
 ---------

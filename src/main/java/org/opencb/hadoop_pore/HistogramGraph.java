@@ -85,7 +85,7 @@ public class HistogramGraph {
 					int value = mapHistory.get(key);
 					int barHeight = Math.round(((float) value
 							/ (float) maxValueY) * height);
-					g2d.setColor(new Color(key, key, key));
+					g2d.setColor(new Color(key % 255, key % 255, key % 255));
 					int yPos = height + yOffset - barHeight;
 					int xPos = key * maxValueX / width;
 					//Rectangle bar = new Rectangle(xPos, yPos, barWidth, barHeight);
