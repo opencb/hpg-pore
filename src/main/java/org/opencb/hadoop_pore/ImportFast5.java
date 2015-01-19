@@ -32,7 +32,7 @@ public class ImportFast5 {
 			importHelp();
 			System.exit(0);
 		}
-		
+				
 		String srcDirName = args[1];
 		String destFileName = args[2];
 		

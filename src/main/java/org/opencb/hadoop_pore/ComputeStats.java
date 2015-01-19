@@ -29,9 +29,9 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
 
-public class ComputeStats  extends Configured implements Tool {
+public class ComputeStats extends Configured implements Tool {
 
-	public static class MyMap extends Mapper<Text, BytesWritable, Text, StatsWritable> {
+	public static class Map extends Mapper<Text, BytesWritable, Text, StatsWritable> {
 		@Override
 		public void setup(Context context) {
 			System.out.println("-----> loading libs..");
@@ -121,7 +121,7 @@ public class ComputeStats  extends Configured implements Tool {
 		}
 	}
 
-	public static class MyCombine extends Reducer<Text, StatsWritable, Text, StatsWritable> {
+	public static class Combine extends Reducer<Text, StatsWritable, Text, StatsWritable> {
 		@Override
 		public void reduce(Text key, Iterable<StatsWritable> values, Context context) throws IOException, InterruptedException {
 			StatsWritable finalStats = new StatsWritable();
@@ -135,7 +135,7 @@ public class ComputeStats  extends Configured implements Tool {
 		}
 	}
 
-	public static class MyReduce extends Reducer<Text, StatsWritable, Text, Text> {
+	public static class Reduce extends Reducer<Text, StatsWritable, Text, Text> {
 		@Override
 		public void reduce(Text key, Iterable<StatsWritable> values, Context context) throws IOException, InterruptedException {
 			System.out.println("***** reduce: key = " + key);
@@ -154,7 +154,7 @@ public class ComputeStats  extends Configured implements Tool {
 
 	public int run(String[] args) throws Exception {
 		Configuration conf = new Configuration();
-		Job job = new Job(conf, "hadoop-nano-stats");
+		Job job = new Job(conf, "hadoop-pore-stats");
 		job.setJarByClass(ComputeStats.class);
 
 		String srcFileName = args[1];
@@ -168,9 +168,9 @@ public class ComputeStats  extends Configured implements Tool {
 		FileOutputFormat.setOutputPath(job, new Path(outDirName));
 
 		// set map, combine, reduce...
-		job.setMapperClass(MyMap.class);
-		//job.setCombinerClass(MyCombine.class);
-		job.setReducerClass(MyReduce.class);
+		job.setMapperClass(ComputeStats.Map.class);
+		job.setCombinerClass(ComputeStats.Combine.class);
+		job.setReducerClass(ComputeStats.Reduce.class);
 		job.setNumReduceTasks(1);
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(StatsWritable.class);
@@ -221,8 +221,10 @@ public class ComputeStats  extends Configured implements Tool {
 			statsHelp();
 			System.exit(0);
 		}
+		// map-reduce
 		int ecode = ToolRunner.run(new ComputeStats(), args);
 
+		// post-processing
 		Configuration conf = new Configuration();
 		FileSystem fs = FileSystem.get(conf);
 

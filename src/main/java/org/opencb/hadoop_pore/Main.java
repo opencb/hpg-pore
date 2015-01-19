@@ -11,10 +11,12 @@ public class Main {
 		
 		String cmd = args[0];
 		
-		if (cmd.equalsIgnoreCase("import-fast5")) {
+		if (cmd.equalsIgnoreCase("import")) {
 			ImportFast5.run(args);
-		} else if (cmd.equalsIgnoreCase("compute-stats")){
+		} else if (cmd.equalsIgnoreCase("stats")){
 			ComputeStats.compute(args);
+		} else if (cmd.equalsIgnoreCase("fastq")){
+			ExportFastq.fastq(args);
 		} else {
 			System.out.println("Error: Unknown command");
 			help();
@@ -55,11 +57,11 @@ public class Main {
 		System.out.println("hadoop jar hadoop-nano.jar <commands> <options>");
 		System.out.println();
 		System.out.println("Commands:");
-		System.out.println("\timport-fast5  : Copy the fast5 files into the Hadoop cluster");
-		System.out.println("\texport-fastq  : Extract the FastQ sequences from the imported Fast5 files");
-		System.out.println("\texport-fasta  : Extract the Fasta sequences from the imported Fast5 files");
-		System.out.println("\tcompute-stats : Compute statistics and generate some plots for the imported Fast5 files");
-		System.out.println("\tplot-signal   : Plot the sequencer's electronic signal over the time for a given Fast5 file"); 
+		System.out.println("\timport   : Copy the fast5 files into the Hadoop cluster");
+		System.out.println("\tfastq    : Extract the FastQ sequences from the imported Fast5 files");
+		System.out.println("\tfasta    : Extract the Fasta sequences from the imported Fast5 files");
+		System.out.println("\tstats    : Compute statistics and generate some plots for the imported Fast5 files");
+		System.out.println("\tsquiggle : Plot the sequencer's electronic signal over the time for a given Fast5 file"); 
 		System.out.println();
 		
 										/*				
