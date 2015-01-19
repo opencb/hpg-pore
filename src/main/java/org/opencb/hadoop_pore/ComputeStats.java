@@ -184,12 +184,51 @@ public class ComputeStats  extends Configured implements Tool {
 
 	public static void compute(String[] args) throws Exception {	
 
+		{
+			HashMap<Double, Double> map = new HashMap<Double, Double>();
+/*			
+			map.put(42126.65, 106.01);
+			map.put(42126.91, 104.28);
+			map.put(42126.94, 89.49);
+			map.put(42126.96, 95.37);
+			map.put(42126.97, 93.61);
+			map.put(42126.98, 97.91);
+*/
+
+			map.put(42126.649600000004, 106.01406509519562);
+			map.put(42126.909, 104.280791015625);
+			map.put(42126.935000000005, 89.49470374561915);
+			map.put(42126.9564, 95.37134024378766);
+			map.put(42126.973000000005, 93.61251678466796);
+			map.put(42126.981, 97.90542332848837);
+			map.put(42126.9982, 101.80486384901889);
+			map.put(42127.154, 103.66451843261717);
+			map.put(42127.166000000005, 102.26012236359831);
+			map.put(42127.3314, 102.95171609120825);
+			map.put(42127.3606, 98.44822291324013);
+			map.put(42127.552800000005, 91.07494995117186);
+			map.put(42127.5668, 94.50640422276086);
+			map.put(42127.5892, 99.72964179256368);
+			map.put(42127.784, 98.80370178222657);
+			map.put(42127.7944, 93.27634470086348);
+			map.put(42127.802, 97.78277201592167);
+			map.put(42127.833600000005, 93.55597003439198);
+			map.put(42127.8428, 95.94762369791667);
+
+			String outLocalDir = "/tmp/pore";
+			int width = 1024;
+			int height = 480;
+
+			JFreeChart chart = Utils.plotSignalChart(map, "Signal for XXX, [2-30] sec.", "measured signal", "time");
+			Utils.saveChart(chart, width, height, outLocalDir + "/signal.jpg");
+			System.exit(0);
+		}
+
 		if (args.length != 3) {
 			System.out.println("Error: Mismatch parameters for stats command");
 			statsHelp();
 			System.exit(0);
 		}
-
 		int ecode = ToolRunner.run(new ComputeStats(), args);
 
 		Configuration conf = new Configuration();
@@ -204,7 +243,6 @@ public class ComputeStats  extends Configured implements Tool {
 			String outLocalDir = "/tmp/pore";
 			String outRawFilename = outLocalDir + "/raw.txt";
 			fs.copyToLocalFile(outFile, new Path(outRawFilename));
-
 
 			PrintWriter writer = new PrintWriter(outLocalDir + "/summary.txt", "UTF-8");
 

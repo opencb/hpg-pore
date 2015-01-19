@@ -152,4 +152,35 @@ public class Utils {
 		return chart;
 	}
 
+	public static JFreeChart plotSignalChart(HashMap<Double, Double> map,
+			String title, String yLabel, String xLabel) {
+		
+		Map<Double, Double> treeMap = new TreeMap<Double, Double>(map);
+		
+		final XYSeries series = new XYSeries("");
+		double yPrev = 0, xStart = 0;
+		double x = 0, y = 0;
+		for(double key: treeMap.keySet()) {
+			x = key;
+			if (yPrev > 0) {
+				series.add(x - xStart, yPrev);
+				System.out.println(x + "\t" + yPrev);
+			} else {
+				xStart = x;
+			}
+			y = treeMap.get(x);
+			series.add((x - xStart), y);
+			System.out.println((x - xStart)  + "\t" + y);
+			yPrev = y;
+		}
+		
+		final XYSeriesCollection dataset = new XYSeriesCollection(series);
+		
+		JFreeChart chart = ChartFactory.createXYLineChart(title, xLabel, yLabel, dataset, PlotOrientation.VERTICAL, false, true, false);
+
+		NumberAxis domainAxis = (NumberAxis) chart.getXYPlot().getDomainAxis();            
+        domainAxis.setRange(0, x - xStart);
+
+		return chart;
+	}
 }
