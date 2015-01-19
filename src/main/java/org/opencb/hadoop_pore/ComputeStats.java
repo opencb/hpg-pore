@@ -183,17 +183,9 @@ public class ComputeStats  extends Configured implements Tool {
 	//-----------------------------------------------------------------------//
 
 	public static void compute(String[] args) throws Exception {	
-
+/*
 		{
 			HashMap<Double, Double> map = new HashMap<Double, Double>();
-/*			
-			map.put(42126.65, 106.01);
-			map.put(42126.91, 104.28);
-			map.put(42126.94, 89.49);
-			map.put(42126.96, 95.37);
-			map.put(42126.97, 93.61);
-			map.put(42126.98, 97.91);
-*/
 
 			map.put(42126.649600000004, 106.01406509519562);
 			map.put(42126.909, 104.280791015625);
@@ -223,7 +215,7 @@ public class ComputeStats  extends Configured implements Tool {
 			Utils.saveChart(chart, width, height, outLocalDir + "/signal.jpg");
 			System.exit(0);
 		}
-
+*/
 		if (args.length != 3) {
 			System.out.println("Error: Mismatch parameters for stats command");
 			statsHelp();
