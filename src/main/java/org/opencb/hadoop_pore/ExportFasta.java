@@ -21,7 +21,7 @@ import org.apache.hadoop.mapreduce.lib.output.MultipleOutputs;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
-public class ExportFastq extends Configured implements Tool {
+public class ExportFasta extends Configured implements Tool {
 	
 	public static class Map extends Mapper<Text, BytesWritable, NullWritable, Text> {
 		
@@ -70,24 +70,20 @@ public class ExportFastq extends Configured implements Tool {
 				// second line: read ID
 				if (i >= lines.length) break;				
 				line = lines[i++];
-				content = new Text(line + "\n");
+				content = new Text("> " + line.substring(1) + "\n");
 				
 				// third line: nucleotides
 				if (i >= lines.length) break;				
 				line = lines[i++];
 				content.append(line.getBytes(), 0, line.length());
-				content.append(brLine, 0, 1);
 
 				// fourth line: +
 				if (i >= lines.length) break;				
 				line = lines[i++];
-				content.append(line.getBytes(), 0, line.length());
-				content.append(brLine, 0, 1);
 
 				// fifth line: qualities
 				if (i >= lines.length) break;				
 				line = lines[i++];
-				content.append(line.getBytes(), 0, line.length());
 
 				multipleOutputs.write(NullWritable.get(), content, name);
 			}
@@ -97,8 +93,8 @@ public class ExportFastq extends Configured implements Tool {
 	@Override
 	public int run(String[] args) throws Exception {
 		Configuration conf = new Configuration();
-		Job job = new Job(conf, "hadoop-pore-fastq");
-		job.setJarByClass(ExportFastq.class);
+		Job job = new Job(conf, "hadoop-pore-fasta");
+		job.setJarByClass(ExportFasta.class);
 
 		String srcFileName = args[1];
 		String outDirName = args[2];
@@ -111,7 +107,7 @@ public class ExportFastq extends Configured implements Tool {
 		FileOutputFormat.setOutputPath(job, new Path(outDirName));
 
 		// set map, combine, reduce...
-		job.setMapperClass(ExportFastq.Map.class);
+		job.setMapperClass(ExportFasta.Map.class);
 		job.setNumReduceTasks(0);
 		job.setOutputKeyClass(NullWritable.class);
 		job.setOutputValueClass(Text.class);
@@ -120,13 +116,13 @@ public class ExportFastq extends Configured implements Tool {
 	}
 
 	//-----------------------------------------------------------------------//
-	// 	                     F A S T Q     C O M M A N D                     //
+	// 	                     F A S T A     C O M M A N D                     //
 	//-----------------------------------------------------------------------//
 	
-	public static void fastq(String[] args) throws Exception {	
+	public static void fasta(String[] args) throws Exception {	
 		if (args.length != 3) {
-			System.out.println("Error: Mismatch parameters for fastq command");
-			fastqHelp();
+			System.out.println("Error: Mismatch parameters for fasta command");
+			fastaHelp();
 			System.exit(-1);
 		}
 
@@ -146,7 +142,7 @@ public class ExportFastq extends Configured implements Tool {
 		args[2] = new String(outHdfsDirname);
 				
 		// map-reduce
-		int error = ToolRunner.run(new ExportFastq(), args);
+		int error = ToolRunner.run(new ExportFasta(), args);
 		if (error != 0) {
 			System.out.println("Error: Running map-reduce job!");
 			System.exit(-1);			
@@ -172,8 +168,8 @@ public class ExportFastq extends Configured implements Tool {
         		if (!outDir.exists()) {
         			outDir.mkdir();
         		}
-        		System.out.println("Copying " + Utils.toModeString(mode) + " sequences for run " + runId + " to the local file " + outLocalRunIdDirname + "/" + Utils.toModeString(mode) + ".fq");
-        		fs.copyToLocalFile(status[i].getPath(), new Path(outLocalRunIdDirname + "/" + Utils.toModeString(mode) + ".fq"));
+        		System.out.println("Copying " + Utils.toModeString(mode) + " sequences for run " + runId + " to the local file " + outLocalRunIdDirname + "/" + Utils.toModeString(mode) + ".fa");
+        		fs.copyToLocalFile(status[i].getPath(), new Path(outLocalRunIdDirname + "/" + Utils.toModeString(mode) + ".fa"));
         		System.out.println("Done.");
         	}
         }
@@ -182,9 +178,9 @@ public class ExportFastq extends Configured implements Tool {
 	
 	//-----------------------------------------------------------------------//
 
-	public static void fastqHelp() {
-		System.out.println("fastq command:");
-		System.out.println("\thadoop jar hadoop-nano.jar fastq <source> <destination>");
+	public static void fastaHelp() {
+		System.out.println("fasta command:");
+		System.out.println("\thadoop jar hadoop-nano.jar fasta <source> <destination>");
 		System.out.println("Options:");
 		System.out.println("\tsource     : hadoop hdfs file");
 		System.out.println("\tdestination: local destination folder");

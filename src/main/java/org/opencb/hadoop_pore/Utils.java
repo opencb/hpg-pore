@@ -21,6 +21,18 @@ import org.jfree.data.xy.XYSeriesCollection;
 import org.opencb.hadoop_pore.StatsWritable.BasicStats;
 
 public class Utils {
+	public static String toModeString(String mode) {
+		if (mode.equalsIgnoreCase("te")) {
+			return "template";
+		} else if (mode.equalsIgnoreCase("co")) {
+			return "complement";
+		} else if (mode.equalsIgnoreCase("2D")) {
+			return mode;
+		} else {
+			return "unknown";
+		}
+	}
+	
 	public static long date2seconds(String str_date) throws ParseException {
 		DateFormat formatter = new SimpleDateFormat("yyyy-MMM-dd HH:mm:ss");
 		Date date = (Date) formatter.parse(str_date); 

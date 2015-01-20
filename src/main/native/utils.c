@@ -419,7 +419,7 @@ char *get_fastqs(char *file_image, int file_size) {
   if (fastq_2d) {
     memcpy(p, run_id, run_id_len);
 	p += run_id_len;
-    memcpy(p, "-2d\n", 4);
+    memcpy(p, "-2D\n", 4);
     p += 4;
     memcpy(p, fastq_2d, size_2d);
     p += size_2d;

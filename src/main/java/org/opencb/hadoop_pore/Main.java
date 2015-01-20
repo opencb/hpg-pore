@@ -17,6 +17,8 @@ public class Main {
 			ComputeStats.compute(args);
 		} else if (cmd.equalsIgnoreCase("fastq")){
 			ExportFastq.fastq(args);
+		} else if (cmd.equalsIgnoreCase("fasta")){
+			ExportFasta.fasta(args);
 		} else {
 			System.out.println("Error: Unknown command");
 			help();
