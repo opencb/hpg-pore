@@ -4,6 +4,7 @@ import org.opencb.hadoop_pore.hadoop.HadoopImportCmd;
 
 public class Main {
 	public static final String BINARY_NAME = "hpg-pore";
+	public static final String VERSION = "0.1.0";
 	
 	public static void main(String[] args) throws Exception {
 		if (args.length == 0) {
@@ -28,6 +29,10 @@ public class Main {
 			FastqCmd.run(newArgs);
 		} else	if (cmd.equalsIgnoreCase("fasta")){
 			FastaCmd.run(newArgs);
+		} else	if (cmd.equalsIgnoreCase("help")){
+			help();
+		} else	if (cmd.equalsIgnoreCase("version")){
+			version();
 		} else {
 			System.out.println("Error: Unknown command");
 			help();
@@ -36,7 +41,7 @@ public class Main {
 	}
 
 	public static void help() {
-		System.out.println("Usage: " + Main.BINARY_NAME + " COMMAND");
+		System.out.println("Usage: " + BINARY_NAME + " COMMAND");
 		System.out.println("	   where COMMAND is one of:");
 		System.out.println();
 		System.out.println("\tstats     explore Fast5 reads by computing statistics and plotting charts");
@@ -56,4 +61,9 @@ public class Main {
 		System.out.println();
 		System.out.println("Most commands print help when invoked w/o parameters.");
 	}
+	
+	public static void version() {
+		System.out.println("Version: " + BINARY_NAME + " " + VERSION);
+	}
+
 }

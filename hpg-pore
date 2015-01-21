@@ -42,7 +42,7 @@ case $COMMAND in
   	;;
   
   # command commands (hadoop or local commands)
-  stats|fastq|fasta|squiggle)
+  stats|fastq|fasta|squiggle|version)
   	for var in "$@"
 	do
     	if [ $var = "--hadoop" ]; then
@@ -53,16 +53,17 @@ case $COMMAND in
   
   # default: invalid commands  
   *)
+    echo "Unknown command: $COMMAND"
     print_usage
     exit
     ;;
 esac
 
 if [ $HADOOP -eq 1 ]; then
-	echo "hadoop jar /tmp/libs/hadoop-pore-0.1.0.jar $@"
+	# echo "hadoop jar /tmp/libs/hadoop-pore-0.1.0.jar $@"
 	hadoop jar /tmp/libs/hadoop-pore-0.1.0.jar $@ 
 else
-	echo "java -jar /tmp/libs/hadoop-pore-0.1.0.jar $@"
+	# echo "java -jar /tmp/libs/hadoop-pore-0.1.0.jar $@"
 	java -jar /tmp/libs/hadoop-pore-0.1.0.jar $@
 fi
 
