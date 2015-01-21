@@ -1,18 +1,12 @@
 package org.opencb.hadoop_pore.hadoop;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.text.ParseException;
-import java.util.HashMap;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
-import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.Text;
@@ -23,11 +17,6 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
-import org.apache.hadoop.util.ToolRunner;
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.data.category.DefaultCategoryDataset;
 import org.opencb.hadoop_pore.NativePoreSupport;
 import org.opencb.hadoop_pore.Utils;
 
@@ -60,65 +49,15 @@ public class HadoopStatsCmd extends Configured implements Tool {
 
 			String info = new NativePoreSupport().getInfo(value.getBytes());
 
-			Text runId = new Text("run-id-unknown");
+			Text runId = null;
 			StatsWritable stats = new StatsWritable();
 
-			long startTime = -1;
-			int i, index, channel = -1;
-
-			if (info != null) {
-				String v;
-				String[] fields;
-				String[] lines = info.split("\n");
-
-				// time_stamp
-				v = lines[1].split("\t")[1];
-				if (!v.isEmpty()) {
-					try {
-						startTime = Utils.date2seconds(v);
-					} catch (ParseException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-						startTime = -1;
-					}
-				}
-
-				// channel
-				v = lines[3].split("\t")[1];
-				if (!v.isEmpty()) {
-					channel = Integer.valueOf(v);
-				}
-
-				// run id
-				v = lines[11].split("\t")[1];
-				if (!v.isEmpty()) {
-					runId = new Text("run-id-" + v);
-				}
-
-				// template, complement and 2D
-				index = 13;
-				for (i = index; i < lines.length; i++) {
-					v = lines[i].split("\t")[0];
-					if (v.equalsIgnoreCase("-te")) {
-						Utils.setStatsByInfo(lines, i+4, startTime, stats.sTemplate);
-					} else if (v.equalsIgnoreCase("-co")) {
-						Utils.setStatsByInfo(lines, i+4, startTime, stats.sComplement);
-					} else if (v.equalsIgnoreCase("-2d")) {
-						Utils.setStatsByInfo(lines, i+3, startTime, stats.s2D);
-					}
-				}
-
-				long num_nt = stats.sTemplate.maxSeqLength + stats.sComplement.maxSeqLength + stats.s2D.maxSeqLength;
-
-				if (num_nt > 0) {
-					// update maps for channel
-					stats.rChannelMap.put(channel, 1);
-					stats.yChannelMap.put(channel, num_nt);
-				}
-
+			String name = Utils.parseAndInitStats(info, stats);
+			if (name != null) {
+				runId = new Text(name);
+			} else {
+				runId = new Text("run-id-unknown");
 			}
-			System.out.println("(start time, channel, run id) = (" + startTime + ", " + channel + ", " + runId + ")");
-			System.out.println("+++++ from map: stats:\n" + stats.toString());
 			context.write(runId, stats);
 		}
 	}
@@ -159,8 +98,8 @@ public class HadoopStatsCmd extends Configured implements Tool {
 		Job job = new Job(conf, "hadoop-pore-stats");
 		job.setJarByClass(HadoopStatsCmd.class);
 
-		String srcFileName = args[1];
-		String outDirName = args[2];
+		String srcFileName = args[0];
+		String outDirName = args[1];
 
 		// add input files to mapreduce processing
 		FileInputFormat.addInputPath(job, new Path(srcFileName));
@@ -180,12 +119,7 @@ public class HadoopStatsCmd extends Configured implements Tool {
 		return (job.waitForCompletion(true) ? 0 : 1);
 	}
 
-	//-----------------------------------------------------------------------//
-	// 	                     S T A T S     C O M M A N D                     //
-	//-----------------------------------------------------------------------//
-
-	public static void compute(String[] args) throws Exception {	
-/*
+	/*
 		{
 			HashMap<Double, Double> map = new HashMap<Double, Double>();
 
@@ -217,202 +151,5 @@ public class HadoopStatsCmd extends Configured implements Tool {
 			Utils.saveChart(chart, width, height, outLocalDir + "/signal.jpg");
 			System.exit(0);
 		}
-*/
-		if (args.length != 3) {
-			System.out.println("Error: Mismatch parameters for stats command");
-			statsHelp();
-			System.exit(0);
-		}
-		// map-reduce
-		int ecode = ToolRunner.run(new HadoopStatsCmd(), args);
-
-		// post-processing
-		Configuration conf = new Configuration();
-		FileSystem fs = FileSystem.get(conf);
-
-		Path outFile = new Path(args[2] + "/part-r-00000");
-		System.out.println("out file = " + outFile.getName());
-
-		if (!fs.exists(outFile)) {
-			System.out.println("out file = " + outFile.getName() + " does not exist !!");
-		} else {
-			String outLocalDir = "/tmp/pore";
-			String outRawFilename = outLocalDir + "/raw.txt";
-			fs.copyToLocalFile(outFile, new Path(outRawFilename));
-
-			PrintWriter writer = new PrintWriter(outLocalDir + "/summary.txt", "UTF-8");
-
-			int i, value;
-			String line, runId;
-			String[] fields;
-
-			JFreeChart chart;
-			HashMap<Integer, Integer> hist;
-			int width = 1024;
-			int height = 480;
-
-			BufferedReader in = new BufferedReader(new FileReader(new File(outRawFilename)));
-
-			while (true) {
-				// run id	
-				line = in.readLine();
-				fields = line.split("\t");
-				runId = fields[0].substring(7);
-				writer.println("-----------------------------------------------------------------------");
-				writer.println(" Statistics for run " + runId);
-				writer.println("-----------------------------------------------------------------------");
-
-				// skip
-				in.readLine();
-
-				// plot: channel vs num. reads
-				hist = new HashMap<Integer, Integer>();
-
-				line = in.readLine();
-				value = Integer.parseInt(line);
-				if (value > 0) {
-					for (i = 0; i < value; i++) {
-						line = in.readLine();
-						fields = line.split("\t");
-						hist.put(Integer.valueOf(fields[0]), Integer.valueOf(fields[1]));
-					}
-					chart = Utils.plotChannelChart(hist, "Number of reads per channel", "reads");
-					Utils.saveChart(chart, width, height, outLocalDir + "/" + runId + "_channel_reads.jpg");
-				}
-
-				// skip
-				in.readLine();
-
-				// plot: channel vs yield
-				hist = new HashMap<Integer, Integer>();
-
-				line = in.readLine();
-				value = Integer.parseInt(line);
-				if (value > 0) {
-					for (i = 0; i < value; i++) {
-						line = in.readLine();
-						fields = line.split("\t");
-						hist.put(Integer.valueOf(fields[0]), Integer.valueOf(fields[1]));
-					}
-					chart = Utils.plotChannelChart(hist, "Yield per channel", "yield (nucleotides)");
-					Utils.saveChart(chart, width, height, outLocalDir + "/" + runId + "_channel_yield.jpg");
-				}
-
-				for (int j = 0; j < 3; j++) {
-					String label = null;
-					line = in.readLine();
-					fields = line.split("\t");
-					if (fields[0].equalsIgnoreCase("-te")) {
-						label = new String("template");
-						writer.println("\nTemplate:");
-					} else if (fields[0].equalsIgnoreCase("-co")) {
-						label = new String("complement");
-						writer.println("\nComplement:");					
-					} else if (fields[0].equalsIgnoreCase("-2d")) {
-						label = new String("2d");
-						writer.println("\n2D:");
-					}
-
-					// num. seqs
-					line = in.readLine();
-					int numSeqs = Integer.parseInt(line);
-					writer.println("\tNum. seqs: " + numSeqs);
-
-					// total length
-					line = in.readLine();
-					int totalLength = Integer.parseInt(line);
-					writer.println("\tNum. nucleotides: " + totalLength);
-					writer.println();
-					writer.println("\tMean read length: " + totalLength / numSeqs);
-
-					// min read length
-					line = in.readLine();
-					value = Integer.parseInt(line);
-					writer.println("\tMin. read length: " + value);
-
-					// max read length
-					line = in.readLine();
-					value = Integer.parseInt(line);
-					writer.println("\tMax. read length: " + value);
-
-					writer.println();
-					writer.println("\tNucleotides content:");
-
-					// A
-					line = in.readLine();
-					value = Integer.parseInt(line);
-					writer.println("\t\tA: " + value + " (" + (100.0f * value / totalLength) + " %)");
-
-					// T
-					line = in.readLine();
-					value = Integer.parseInt(line);
-					writer.println("\t\tT: " + value + " (" + (100.0f * value / totalLength) + " %)");
-
-					// G
-					line = in.readLine();
-					value = Integer.parseInt(line);
-					writer.println("\t\tG: " + value + " (" + (100.0f * value / totalLength) + " %)");
-					int numGC = value;
-
-					// C
-					line = in.readLine();
-					value = Integer.parseInt(line);
-					writer.println("\t\tC: " + value + " (" + (100.0f * value / totalLength) + " %)");
-					numGC += value;
-
-					// N
-					line = in.readLine();
-					value = Integer.parseInt(line);
-					writer.println("\t\tN: " + value + " (" + (100.0f * value / totalLength) + " %)");
-
-					writer.println();
-					writer.println("\t\tGC: " + (100.0f * numGC / totalLength) + " %");
-
-					// plot: read length vs frequency
-					hist = new HashMap<Integer, Integer>();
-
-					line = in.readLine();
-					value = Integer.parseInt(line);
-					if (value > 0) {
-						for (i = 0; i < value; i++) {
-							line = in.readLine();
-							fields = line.split("\t");
-							hist.put(Integer.valueOf(fields[0]), Integer.valueOf(fields[1]));
-						}
-						chart = Utils.plotHistogram(hist, "Read length histogram (" + label + ")", "read length", "frequency");
-						Utils.saveChart(chart, width, height, outLocalDir + "/" + runId + "_" + label + "_read_length.jpg");
-					}
-
-					// plot: time vs yield
-					hist = new HashMap<Integer, Integer>();
-
-					line = in.readLine();
-					value = Integer.parseInt(line);
-					if (value > 0) {
-						for (i = 0; i < value; i++) {
-							line = in.readLine();
-							fields = line.split("\t");
-							hist.put(Integer.valueOf(fields[0]), Integer.valueOf(fields[1]));
-						}
-						chart = Utils.plotCumulativeChart(hist, "Cumulative yield (" + label + ")", "time (seconds)", "yield (cumulative nucleotides)");
-						Utils.saveChart(chart, width, height, outLocalDir + "/" + runId + "_" + label + "_yield.jpg");
-					}
-				}
-
-				break;
-			}
-			in.close();
-			writer.close();
-		}
-	}
-
-	//-----------------------------------------------------------------------//
-
-	public static void statsHelp() {
-		System.out.println("stats command:");
-		System.out.println("\thadoop jar hadoop-nano.jar stats <source> <destination>");
-		System.out.println("Options:");
-		System.out.println("\tsource     : hdfs file where you imported the fast5 files");
-		System.out.println("\tdestination: destination local folder to save stats, plots,...");
-	}	
+	 */
 }

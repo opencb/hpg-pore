@@ -245,7 +245,7 @@ public class Utils {
 		return chart;
 	}
 
-	public String parseAndInitStats(String info, StatsWritable stats) {
+	public static String parseAndInitStats(String info, StatsWritable stats) {
 		String runId = null;
 		long startTime = -1;
 		int i, index, channel = -1;
@@ -302,7 +302,7 @@ public class Utils {
 		return runId;
 	}
 
-	static void parseStatsFile(String rawFileName, String outDir) throws Exception {
+	public static void parseStatsFile(String rawFileName, String outDir) throws Exception {
 		PrintWriter writer = new PrintWriter(outDir + "/summary.txt", "UTF-8");
 
 		int i, value;
