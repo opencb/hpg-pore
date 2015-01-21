@@ -1,77 +1,59 @@
 package org.opencb.hadoop_pore;
 
+import org.opencb.hadoop_pore.hadoop.HadoopImportCmd;
+
 public class Main {
+	public static final String BINARY_NAME = "hpg-pore";
+	
 	public static void main(String[] args) throws Exception {
-		
 		if (args.length == 0) {
 			System.out.println("Error: Missing command");
 			help();
 			System.exit(0);
 		}
-		
+
 		String cmd = args[0];
-		
+
+		String[] newArgs = new String[args.length - 1]; 
+		for(int i = 1; i < args.length; i++) {
+			newArgs[i-1] = new String(args[i]);
+		}	
+
+
 		if (cmd.equalsIgnoreCase("import")) {
-			ImportFast5.run(args);
+			HadoopImportCmd.run(newArgs);
 		} else if (cmd.equalsIgnoreCase("stats")){
-			ComputeStats.compute(args);
+			StatsCmd.run(newArgs);
 		} else if (cmd.equalsIgnoreCase("fastq")){
-			ExportFastq.fastq(args);
-		} else if (cmd.equalsIgnoreCase("fasta")){
-			ExportFasta.fasta(args);
+			FastqCmd.run(newArgs);
+		} else	if (cmd.equalsIgnoreCase("fasta")){
+			FastaCmd.run(newArgs);
 		} else {
 			System.out.println("Error: Unknown command");
 			help();
 			System.exit(0);
 		}
-		/*
-		int ecode = ToolRunner.run(new MultipleInputFile(), args);
-
-
-		Configuration conf = new Configuration();
-		FileSystem fs = FileSystem.get(conf);
-
-		Path outFile = new Path(args[2] + "/part-r-00000");
-		System.out.println("out file = " + outFile.getName());
-
-		if (!fs.exists(outFile)) {
-			System.out.println("out file = " + outFile.getName() + " does not exist !!");
-		} else {			
-			FSDataInputStream in = fs.open(outFile);
-			int bytesRead;
-			byte[] buffer = new byte[2038];
-			while ((bytesRead = in.read(buffer)) > 0) {
-				System.out.println("num. reads bytes = " + bytesRead);
-				for (int i = 0; i < bytesRead; i++) {
-					System.out.print((char) buffer[i]);
-				}
-			}
-			in.close();
-		}
-
-		new HistogramGraph();
-
-		System.exit(ecode);
-		 */
 	}
-	
+
 	public static void help() {
-		System.out.println("hadoop jar hadoop-nano.jar <commands> <options>");
+		System.out.println("Usage: " + Main.BINARY_NAME + " COMMAND");
+		System.out.println("	   where COMMAND is one of:");
 		System.out.println();
-		System.out.println("Commands:");
-		System.out.println("\timport   : Copy the fast5 files into the Hadoop cluster");
-		System.out.println("\tfastq    : Extract the FastQ sequences from the imported Fast5 files");
-		System.out.println("\tfasta    : Extract the Fasta sequences from the imported Fast5 files");
-		System.out.println("\tstats    : Compute statistics and generate some plots for the imported Fast5 files");
-		System.out.println("\tsquiggle : Plot the sequencer's electronic signal over the time for a given Fast5 file"); 
+		System.out.println("\tstats     explore Fast5 reads by computing statistics and plotting charts");
+		System.out.println("\tsquiggle  plot the measured signal for a given Fast5 read");
+		System.out.println("\tfastq     extract the sequences in Fastq format for a set of Fast5 reads");
+		System.out.println("\tfasta     extract the sequences in Fasta format for a set of Fast5 reads");
 		System.out.println();
-		
-										/*				
-
-						hadoop jar hadoop-nano.jar export-fastq <hdfs id> <destination local folder> [run id]
-						hadoop jar hadoop-nano.jar export-fasta <hdfs id> <destination local folder> [run id]
-
-						hadoop jar hadoop-nano.jar plot-signal <hdfs id> <fast5 file name> <destination local folder> [min seconds] [max seconds]
-										 */
+		System.out.println("Previous commands can run both on a local system and on a Hadoop environment (for the latter, use the option --hadoop.");
+		System.out.println("Before executing those commands on a Hadoop environment, you must copy your Fast5 files to the Hadoop file system by running the command:");
+		System.out.println();
+		System.out.println("\timport    copy the Fast5 files into the Hadoop environment (a HDFS Hadoop file)");
+		System.out.println();
+		System.out.println("Other commands:");
+		System.out.println();
+		System.out.println("\tversion   print the version");
+		System.out.println("\thelp      print this help");
+		System.out.println();
+		System.out.println("Most commands print help when invoked w/o parameters.");
 	}
 }

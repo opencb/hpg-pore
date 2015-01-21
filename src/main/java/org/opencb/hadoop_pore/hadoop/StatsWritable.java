@@ -1,11 +1,14 @@
-package org.opencb.hadoop_pore;
+package org.opencb.hadoop_pore.hadoop;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.HashMap;
 
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
+import org.opencb.hadoop_pore.Utils;
 
 public class StatsWritable implements Writable {
 
@@ -26,7 +29,7 @@ public class StatsWritable implements Writable {
 	}
 
 	public void update(StatsWritable stats) {
-		
+
 		int v1 = 0;
 		for(Object key:stats.rChannelMap.keySet()) {
 			v1 = stats.rChannelMap.get((Integer) key);
@@ -35,7 +38,7 @@ public class StatsWritable implements Writable {
 			}
 			rChannelMap.put((Integer) key, v1);
 		}
-		
+
 		long v2 = 0;
 		for(Object key:stats.yChannelMap.keySet()) {
 			v2 = stats.yChannelMap.get((Integer) key);
@@ -52,13 +55,13 @@ public class StatsWritable implements Writable {
 
 	public void readFields(DataInput in) throws IOException {
 		int size;
-		
+
 		rChannelMap = new HashMap<Integer, Integer>();
 		size = in.readInt();
 		for (int i = 0; i < size; i++) {
 			rChannelMap.put(in.readInt(), in.readInt());
 		}
-		
+
 		yChannelMap = new HashMap<Integer, Long>();
 		size = in.readInt();
 		for (int i = 0; i < size; i++) {
@@ -71,7 +74,7 @@ public class StatsWritable implements Writable {
 	}
 
 	public void write(DataOutput out) throws IOException {
-		
+
 		out.writeInt(rChannelMap.size());
 		for(Object key:rChannelMap.keySet()) {
 			out.writeInt((Integer) key);
@@ -91,7 +94,7 @@ public class StatsWritable implements Writable {
 
 	public String toFormat() {
 		String res = new String();
-		
+
 		res += "\n";
 		res += "reads-per-channel\n";
 		res += rChannelMap.size() + "\n";
@@ -104,20 +107,20 @@ public class StatsWritable implements Writable {
 		for(Object key:yChannelMap.keySet()) {
 			res += ((Integer) key) + "\t" + ((Long) yChannelMap.get(key)) + "\n";
 		}
-		
+
 		res += "-te\n";
 		res += sTemplate.toFormat();
 		res += "-co\n";
 		res += sComplement.toFormat();
 		res += "-2d\n";
 		res += s2D.toFormat();
-		
+
 		return res;
 	}
 
 	public String toString() {
 		String res = new String();
-		
+
 		res += "reads-per-channel\n";
 		res += rChannelMap.size() + "\n";
 		for(Object key:rChannelMap.keySet()) {
@@ -136,7 +139,7 @@ public class StatsWritable implements Writable {
 		res += sComplement.toString();
 		res += "-2d\n";
 		res += s2D.toString();
-		
+
 		return res;
 	}
 
@@ -180,13 +183,13 @@ public class StatsWritable implements Writable {
 			out.writeInt(minSeqLength);
 			out.writeInt(accSeqLength);
 			out.writeInt(maxSeqLength);
-			
+
 			out.writeInt(lengthMap.size());
 			for(Object key:lengthMap.keySet()) {
 				out.writeInt((Integer) key);
 				out.writeInt((Integer) lengthMap.get(key));
 			}
-			
+
 			out.writeInt(yieldMap.size());
 			for(Object key:yieldMap.keySet()) {
 				out.writeLong((Long) key);
@@ -208,13 +211,13 @@ public class StatsWritable implements Writable {
 			maxSeqLength = in.readInt();
 
 			int size;
-			
+
 			lengthMap = new HashMap<Integer, Integer>();
 			size = in.readInt();
 			for (int i = 0; i < size; i++) {
 				lengthMap.put(in.readInt(), in.readInt());
 			}
-			
+
 			yieldMap = new HashMap<Long, Long>();
 			size = in.readInt();
 			for (int i = 0; i < size; i++) {
@@ -242,7 +245,7 @@ public class StatsWritable implements Writable {
 					}
 					lengthMap.put((Integer) key, v1);
 				}
-				
+
 				long v2 = 0;
 				for(Object key:stats.yieldMap.keySet()) {
 					v2 = stats.yieldMap.get((Long) key);
@@ -273,7 +276,7 @@ public class StatsWritable implements Writable {
 				for(Object key:lengthMap.keySet()) {
 					res += ((Integer) key) + "\t" + ((Integer) lengthMap.get(key)) + "\n";
 				}
-				
+
 				res += yieldMap.size() + "\n";
 				for(Object key:yieldMap.keySet()) {
 					res += ((Long) key) + "\t" + ((Long) yieldMap.get(key)) + "\n";
@@ -308,7 +311,7 @@ public class StatsWritable implements Writable {
 					for(Object key:lengthMap.keySet()) {
 						res += "\t" + ((Integer) key) + "\t" + ((Integer) lengthMap.get(key)) + "\n";
 					}
-					
+
 					res += "Cummulative yield:\n";
 					res += "\tTime (in seconds)\tNum. nt\n";
 					for(Object key:yieldMap.keySet()) {
@@ -319,5 +322,64 @@ public class StatsWritable implements Writable {
 
 			return res;
 		}	
+	}
+
+	public String parseAndInit(String info) {
+		String runId = null;
+		long startTime = -1;
+		int i, index, channel = -1;
+
+		if (info != null) {
+			String v;
+			String[] fields;
+			String[] lines = info.split("\n");
+
+			// time_stamp
+			v = lines[1].split("\t")[1];
+			if (!v.isEmpty()) {
+				try {
+					startTime = Utils.date2seconds(v);
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					startTime = -1;
+				}
+			}
+
+			// channel
+			v = lines[3].split("\t")[1];
+			if (!v.isEmpty()) {
+				channel = Integer.valueOf(v);
+			}
+
+			// run id
+			v = lines[11].split("\t")[1];
+			if (!v.isEmpty()) {
+				runId = new String("run-id-" + v);
+			}
+
+			// template, complement and 2D
+			index = 13;
+			for (i = index; i < lines.length; i++) {
+				v = lines[i].split("\t")[0];
+				if (v.equalsIgnoreCase("-te")) {
+					Utils.setStatsByInfo(lines, i+4, startTime, sTemplate);
+				} else if (v.equalsIgnoreCase("-co")) {
+					Utils.setStatsByInfo(lines, i+4, startTime, sComplement);
+				} else if (v.equalsIgnoreCase("-2d")) {
+					Utils.setStatsByInfo(lines, i+3, startTime, s2D);
+				}
+			}
+
+			long num_nt = sTemplate.maxSeqLength + sComplement.maxSeqLength + s2D.maxSeqLength;
+
+			if (num_nt > 0) {
+				// update maps for channel
+				rChannelMap.put(channel, 1);
+				yChannelMap.put(channel, num_nt);
+			}
+		}
+		
+		return runId;
 	}
 }

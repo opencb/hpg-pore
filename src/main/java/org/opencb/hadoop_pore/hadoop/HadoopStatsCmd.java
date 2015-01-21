@@ -1,4 +1,4 @@
-package org.opencb.hadoop_pore;
+package org.opencb.hadoop_pore.hadoop;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -28,8 +28,10 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
+import org.opencb.hadoop_pore.NativePoreSupport;
+import org.opencb.hadoop_pore.Utils;
 
-public class ComputeStats extends Configured implements Tool {
+public class HadoopStatsCmd extends Configured implements Tool {
 
 	public static class Map extends Mapper<Text, BytesWritable, Text, StatsWritable> {
 		@Override
@@ -155,7 +157,7 @@ public class ComputeStats extends Configured implements Tool {
 	public int run(String[] args) throws Exception {
 		Configuration conf = new Configuration();
 		Job job = new Job(conf, "hadoop-pore-stats");
-		job.setJarByClass(ComputeStats.class);
+		job.setJarByClass(HadoopStatsCmd.class);
 
 		String srcFileName = args[1];
 		String outDirName = args[2];
@@ -168,9 +170,9 @@ public class ComputeStats extends Configured implements Tool {
 		FileOutputFormat.setOutputPath(job, new Path(outDirName));
 
 		// set map, combine, reduce...
-		job.setMapperClass(ComputeStats.Map.class);
-		job.setCombinerClass(ComputeStats.Combine.class);
-		job.setReducerClass(ComputeStats.Reduce.class);
+		job.setMapperClass(HadoopStatsCmd.Map.class);
+		job.setCombinerClass(HadoopStatsCmd.Combine.class);
+		job.setReducerClass(HadoopStatsCmd.Reduce.class);
 		job.setNumReduceTasks(1);
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(StatsWritable.class);
@@ -222,7 +224,7 @@ public class ComputeStats extends Configured implements Tool {
 			System.exit(0);
 		}
 		// map-reduce
-		int ecode = ToolRunner.run(new ComputeStats(), args);
+		int ecode = ToolRunner.run(new HadoopStatsCmd(), args);
 
 		// post-processing
 		Configuration conf = new Configuration();
@@ -402,19 +404,13 @@ public class ComputeStats extends Configured implements Tool {
 			in.close();
 			writer.close();
 		}
-
-
-
-		//		HistogramGraph graph = new HistogramGraph(hist);
-		//		graph.save("/tmp/lentgh_hist.png");
-
 	}
 
 	//-----------------------------------------------------------------------//
 
 	public static void statsHelp() {
-		System.out.println("compute-stats command:");
-		System.out.println("\thadoop jar hadoop-nano.jar compute-stats <source> <destination>");
+		System.out.println("stats command:");
+		System.out.println("\thadoop jar hadoop-nano.jar stats <source> <destination>");
 		System.out.println("Options:");
 		System.out.println("\tsource     : hdfs file where you imported the fast5 files");
 		System.out.println("\tdestination: destination local folder to save stats, plots,...");
