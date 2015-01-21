@@ -1,4 +1,4 @@
-package org.opencb.hadoop_pore.hadoop;
+package org.opencb.hpg_pore.hadoop;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -8,7 +8,7 @@ import java.util.HashMap;
 
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
-import org.opencb.hadoop_pore.Utils;
+import org.opencb.hpg_pore.Utils;
 
 public class StatsWritable implements Writable {
 

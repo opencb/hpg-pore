@@ -1,4 +1,4 @@
-package org.opencb.hadoop_pore;
+package org.opencb.hpg_pore;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -26,8 +26,8 @@ import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import org.opencb.hadoop_pore.hadoop.StatsWritable;
-import org.opencb.hadoop_pore.hadoop.StatsWritable.BasicStats;
+import org.opencb.hpg_pore.hadoop.StatsWritable;
+import org.opencb.hpg_pore.hadoop.StatsWritable.BasicStats;
 
 public class Utils {
 

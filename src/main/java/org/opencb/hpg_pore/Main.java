@@ -1,6 +1,6 @@
-package org.opencb.hadoop_pore;
+package org.opencb.hpg_pore;
 
-import org.opencb.hadoop_pore.hadoop.HadoopImportCmd;
+import org.opencb.hpg_pore.hadoop.HadoopImportCmd;
 
 public class Main {
 	public static final String BINARY_NAME = "hpg-pore";

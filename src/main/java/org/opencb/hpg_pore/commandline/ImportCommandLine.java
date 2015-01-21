@@ -1,4 +1,4 @@
-package org.opencb.hadoop_pore.commandline;
+package org.opencb.hpg_pore.commandline;
 
 import com.beust.jcommander.Parameter;
 

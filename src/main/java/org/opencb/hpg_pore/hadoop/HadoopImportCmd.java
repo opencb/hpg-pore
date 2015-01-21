@@ -1,4 +1,4 @@
-package org.opencb.hadoop_pore.hadoop;
+package org.opencb.hpg_pore.hadoop;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,9 +15,9 @@ import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.SequenceFile.CompressionType;
 import org.apache.hadoop.io.Text;
-import org.opencb.hadoop_pore.Main;
-import org.opencb.hadoop_pore.Utils;
-import org.opencb.hadoop_pore.commandline.FastqCommandLine;
+import org.opencb.hpg_pore.Main;
+import org.opencb.hpg_pore.Utils;
+import org.opencb.hpg_pore.commandline.FastqCommandLine;
 
 import com.beust.jcommander.JCommander;
 

@@ -1,4 +1,4 @@
-package org.opencb.hadoop_pore.hadoop;
+package org.opencb.hpg_pore.hadoop;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,8 +17,8 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
-import org.opencb.hadoop_pore.NativePoreSupport;
-import org.opencb.hadoop_pore.Utils;
+import org.opencb.hpg_pore.NativePoreSupport;
+import org.opencb.hpg_pore.Utils;
 
 public class HadoopStatsCmd extends Configured implements Tool {
 

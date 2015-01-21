@@ -1,4 +1,4 @@
-package org.opencb.hadoop_pore;
+package org.opencb.hpg_pore;
 
 import java.io.File;
 import java.net.InetAddress;

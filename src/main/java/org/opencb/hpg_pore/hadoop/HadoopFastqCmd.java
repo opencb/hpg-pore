@@ -1,4 +1,4 @@
-package org.opencb.hadoop_pore.hadoop;
+package org.opencb.hpg_pore.hadoop;
 
 import java.io.IOException;
 
@@ -16,10 +16,10 @@ import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.MultipleOutputs;
 import org.apache.hadoop.util.Tool;
-import org.opencb.hadoop_pore.FastaCmd;
-import org.opencb.hadoop_pore.NativePoreSupport;
+import org.opencb.hpg_pore.FastaCmd;
+import org.opencb.hpg_pore.NativePoreSupport;
 
-public class HadoopFastaCmd extends Configured implements Tool {
+public class HadoopFastqCmd extends Configured implements Tool {
 	public static class Map extends Mapper<Text, BytesWritable, NullWritable, Text> {
 
 		private MultipleOutputs<NullWritable, Text> multipleOutputs = null; 
@@ -64,11 +64,22 @@ public class HadoopFastaCmd extends Configured implements Tool {
 
 				// second line: read ID
 				line = lines[i + 1];
-				content = new Text("> " + line.substring(1) + "\n");
+				content = new Text(line + "\n");
 
 				// third line: nucleotides
 				line = lines[i + 2];
 				content.append(line.getBytes(), 0, line.length());
+				content.append(brLine, 0, 1);
+
+				// fourth line: +
+				line = lines[i + 3];
+				content.append(line.getBytes(), 0, line.length());
+				content.append(brLine, 0, 1);
+
+				// fifth line: qualities
+				line = lines[i + 4];
+				content.append(line.getBytes(), 0, line.length());
+				//content.append(brLine, 0, 1);
 
 				multipleOutputs.write(NullWritable.get(), content, name);
 			}
@@ -78,8 +89,8 @@ public class HadoopFastaCmd extends Configured implements Tool {
 	@Override
 	public int run(String[] args) throws Exception {
 		Configuration conf = new Configuration();
-		Job job = new Job(conf, "hadoop-pore-fasta");
-		job.setJarByClass(HadoopFastaCmd.class);
+		Job job = new Job(conf, "hadoop-pore-fastq");
+		job.setJarByClass(HadoopFastqCmd.class);
 
 		String srcFileName = args[0];
 		String outDirName = args[1];

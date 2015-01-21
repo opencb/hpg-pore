@@ -1,4 +1,4 @@
-package org.opencb.hadoop_pore;
+package org.opencb.hpg_pore;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -13,8 +13,8 @@ import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.util.ToolRunner;
-import org.opencb.hadoop_pore.commandline.FastaCommandLine;
-import org.opencb.hadoop_pore.hadoop.HadoopFastaCmd;
+import org.opencb.hpg_pore.commandline.FastaCommandLine;
+import org.opencb.hpg_pore.hadoop.HadoopFastaCmd;
 
 import com.beust.jcommander.JCommander;
 

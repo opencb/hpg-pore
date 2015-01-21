@@ -1,13 +1,13 @@
-package org.opencb.hadoop_pore.commandline;
+package org.opencb.hpg_pore.commandline;
 
 import com.beust.jcommander.Parameter;
 
-public class FastqCommandLine {
+public class StatsCommandLine {
 	 
 	  @Parameter(names = "--in", description = "Input folder (or file) where to find Fast5 files", required = true)
 	  private String in;
 	 
-	  @Parameter(names = "--out", description = "Output folder where to save Fastq sequences", required = true)
+	  @Parameter(names = "--out", description = "Output folder where to save statistics results and charts", required = true)
 	  private String out;
 
 	  @Parameter(names = "--hadoop", description = "Run the command on a Hadoop environment")
