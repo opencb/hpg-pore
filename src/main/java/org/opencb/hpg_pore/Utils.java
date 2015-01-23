@@ -380,84 +380,86 @@ public class Utils {
 				int numSeqs = Integer.parseInt(line);
 				writer.println("\tNum. seqs: " + numSeqs);
 
-				// total length
-				line = in.readLine();
-				int totalLength = Integer.parseInt(line);
-				writer.println("\tNum. nucleotides: " + totalLength);
-				writer.println();
-				writer.println("\tMean read length: " + totalLength / numSeqs);
+				if (numSeqs > 0) {
+					// total length
+					line = in.readLine();
+					int totalLength = Integer.parseInt(line);
+					writer.println("\tNum. nucleotides: " + totalLength);
+					writer.println();
+					writer.println("\tMean read length: " + totalLength / numSeqs);
 
-				// min read length
-				line = in.readLine();
-				value = Integer.parseInt(line);
-				writer.println("\tMin. read length: " + value);
+					// min read length
+					line = in.readLine();
+					value = Integer.parseInt(line);
+					writer.println("\tMin. read length: " + value);
 
-				// max read length
-				line = in.readLine();
-				value = Integer.parseInt(line);
-				writer.println("\tMax. read length: " + value);
+					// max read length
+					line = in.readLine();
+					value = Integer.parseInt(line);
+					writer.println("\tMax. read length: " + value);
 
-				writer.println();
-				writer.println("\tNucleotides content:");
+					writer.println();
+					writer.println("\tNucleotides content:");
 
-				// A
-				line = in.readLine();
-				value = Integer.parseInt(line);
-				writer.println("\t\tA: " + value + " (" + (100.0f * value / totalLength) + " %)");
+					// A
+					line = in.readLine();
+					value = Integer.parseInt(line);
+					writer.println("\t\tA: " + value + " (" + (100.0f * value / totalLength) + " %)");
 
-				// T
-				line = in.readLine();
-				value = Integer.parseInt(line);
-				writer.println("\t\tT: " + value + " (" + (100.0f * value / totalLength) + " %)");
+					// T
+					line = in.readLine();
+					value = Integer.parseInt(line);
+					writer.println("\t\tT: " + value + " (" + (100.0f * value / totalLength) + " %)");
 
-				// G
-				line = in.readLine();
-				value = Integer.parseInt(line);
-				writer.println("\t\tG: " + value + " (" + (100.0f * value / totalLength) + " %)");
-				int numGC = value;
+					// G
+					line = in.readLine();
+					value = Integer.parseInt(line);
+					writer.println("\t\tG: " + value + " (" + (100.0f * value / totalLength) + " %)");
+					int numGC = value;
 
-				// C
-				line = in.readLine();
-				value = Integer.parseInt(line);
-				writer.println("\t\tC: " + value + " (" + (100.0f * value / totalLength) + " %)");
-				numGC += value;
+					// C
+					line = in.readLine();
+					value = Integer.parseInt(line);
+					writer.println("\t\tC: " + value + " (" + (100.0f * value / totalLength) + " %)");
+					numGC += value;
 
-				// N
-				line = in.readLine();
-				value = Integer.parseInt(line);
-				writer.println("\t\tN: " + value + " (" + (100.0f * value / totalLength) + " %)");
+					// N
+					line = in.readLine();
+					value = Integer.parseInt(line);
+					writer.println("\t\tN: " + value + " (" + (100.0f * value / totalLength) + " %)");
 
-				writer.println();
-				writer.println("\t\tGC: " + (100.0f * numGC / totalLength) + " %");
+					writer.println();
+					writer.println("\t\tGC: " + (100.0f * numGC / totalLength) + " %");
 
-				// plot: read length vs frequency
-				hist = new HashMap<Integer, Integer>();
+					// plot: read length vs frequency
+					hist = new HashMap<Integer, Integer>();
 
-				line = in.readLine();
-				value = Integer.parseInt(line);
-				if (value > 0) {
-					for (i = 0; i < value; i++) {
-						line = in.readLine();
-						fields = line.split("\t");
-						hist.put(Integer.valueOf(fields[0]), Integer.valueOf(fields[1]));
+					line = in.readLine();
+					value = Integer.parseInt(line);
+					if (value > 0) {
+						for (i = 0; i < value; i++) {
+							line = in.readLine();
+							fields = line.split("\t");
+							hist.put(Integer.valueOf(fields[0]), Integer.valueOf(fields[1]));
+						}
+						chart = Utils.plotHistogram(hist, "Read length histogram (" + label + ")", "read length", "frequency");
+						Utils.saveChart(chart, width, height, outDir + "/" + runId + "_" + label + "_read_length.jpg");
 					}
-					chart = Utils.plotHistogram(hist, "Read length histogram (" + label + ")", "read length", "frequency");
-					Utils.saveChart(chart, width, height, outDir + "/" + runId + "_" + label + "_read_length.jpg");
-				}
 
-				// plot: time vs yield
-				hist = new HashMap<Integer, Integer>();
+					// plot: time vs yield
+					hist = new HashMap<Integer, Integer>();
 
-				line = in.readLine();
-				value = Integer.parseInt(line);
-				if (value > 0) {
-					for (i = 0; i < value; i++) {
-						line = in.readLine();
-						fields = line.split("\t");
-						hist.put(Integer.valueOf(fields[0]), Integer.valueOf(fields[1]));
+					line = in.readLine();
+					value = Integer.parseInt(line);
+					if (value > 0) {
+						for (i = 0; i < value; i++) {
+							line = in.readLine();
+							fields = line.split("\t");
+							hist.put(Integer.valueOf(fields[0]), Integer.valueOf(fields[1]));
+						}
+						chart = Utils.plotCumulativeChart(hist, "Cumulative yield (" + label + ")", "time (seconds)", "yield (cumulative nucleotides)");
+						Utils.saveChart(chart, width, height, outDir + "/" + runId + "_" + label + "_yield.jpg");
 					}
-					chart = Utils.plotCumulativeChart(hist, "Cumulative yield (" + label + ")", "time (seconds)", "yield (cumulative nucleotides)");
-					Utils.saveChart(chart, width, height, outDir + "/" + runId + "_" + label + "_yield.jpg");
 				}
 			}
 

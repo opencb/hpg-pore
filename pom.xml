@@ -31,7 +31,7 @@
 					<archive>
 						<manifest>
 							<addClasspath>true</addClasspath>
-							<mainClass>org.opencb.hadoop_pore.Main</mainClass>
+							<mainClass>org.opencb.hpg_pore.Main</mainClass>
 						</manifest>
 					</archive>
 					<outputDirectory>/tmp/libs</outputDirectory>

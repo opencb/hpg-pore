@@ -12,12 +12,13 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.IOUtils;
+import org.apache.hadoop.io.MapFile;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.SequenceFile.CompressionType;
 import org.apache.hadoop.io.Text;
 import org.opencb.hpg_pore.Main;
 import org.opencb.hpg_pore.Utils;
-import org.opencb.hpg_pore.commandline.FastqCommandLine;
+import org.opencb.hpg_pore.commandline.ImportCommandLine;
 
 import com.beust.jcommander.JCommander;
 
@@ -28,7 +29,7 @@ public class HadoopImportCmd {
 	//-----------------------------------------------------------------------//
 	
 	public static void run(String[] args) {	
-		FastqCommandLine cmdLine = new FastqCommandLine();
+		ImportCommandLine cmdLine = new ImportCommandLine();
 		JCommander cmd = new JCommander(cmdLine);
 		cmd.setProgramName(Main.BINARY_NAME + " import");
 
@@ -53,11 +54,16 @@ public class HadoopImportCmd {
 		Text key = null;
 		BytesWritable value = null;
 		
-		//MapFile.Writer writer = null;
-		SequenceFile.Writer writer = null;
+		MapFile.Writer writer = null;
+		//SequenceFile.Writer writer = null;
 		try {
-			//writer = new MapFile.Writer(conf, fs, destFileName, Text.class, BytesWritable.class);
-			writer = SequenceFile.createWriter(fs, conf, new Path(destFileName), Text.class, BytesWritable.class, CompressionType.NONE);
+			if (cmdLine.isCompression()) {
+				//writer = SequenceFile.createWriter(fs, conf, new Path(destFileName), Text.class, BytesWritable.class, CompressionType.BLOCK);
+				writer = new MapFile.Writer(conf, fs, destFileName, Text.class, BytesWritable.class, CompressionType.BLOCK);
+			} else {
+				//writer = SequenceFile.createWriter(fs, conf, new Path(destFileName), Text.class, BytesWritable.class, CompressionType.NONE);				
+				writer = new MapFile.Writer(conf, fs, destFileName, Text.class, BytesWritable.class);
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -82,6 +88,7 @@ public class HadoopImportCmd {
 				System.out.println("key = " + key);
 				try {
 					writer.append(key, value);
+			
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

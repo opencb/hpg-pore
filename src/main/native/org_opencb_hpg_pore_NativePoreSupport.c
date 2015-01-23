@@ -1,9 +1,9 @@
-#include "org_opencb_hadoop_pore_NativePoreSupport.h"
+#include "org_opencb_hpg_pore_NativePoreSupport.h"
 #include "utils.h"
 
 //------------------------------------------------------------------------------//
 
-JNIEXPORT jstring JNICALL Java_org_opencb_hadoop_1pore_NativePoreSupport_getFastqs(JNIEnv *env, jobject this, jbyteArray array) {
+JNIEXPORT jstring JNICALL Java_org_opencb_hpg_1pore_NativePoreSupport_getFastqs(JNIEnv *env, jobject this, jbyteArray array) {
 
   char *buffer = (*env)->GetByteArrayElements(env, array, NULL);
   int buffer_size = (*env)->GetArrayLength(env, array);
@@ -22,7 +22,7 @@ JNIEXPORT jstring JNICALL Java_org_opencb_hadoop_1pore_NativePoreSupport_getFast
 
 //------------------------------------------------------------------------------//
 
-JNIEXPORT jstring JNICALL Java_org_opencb_hadoop_1pore_NativePoreSupport_getInfo(JNIEnv *env, jobject this, jbyteArray array) {
+JNIEXPORT jstring JNICALL Java_org_opencb_hpg_1pore_NativePoreSupport_getInfo(JNIEnv *env, jobject this, jbyteArray array) {
 
   char *buffer = (*env)->GetByteArrayElements(env, array, NULL);
   int buffer_size = (*env)->GetArrayLength(env, array);

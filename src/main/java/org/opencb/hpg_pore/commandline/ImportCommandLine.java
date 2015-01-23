@@ -9,6 +9,9 @@ public class ImportCommandLine {
 	 
 	  @Parameter(names = "--out", description = "Output HDFS Hadoop file where to save Fastq sequences", required = true)
 	  private String out;
+	  
+	  @Parameter(names = "--compress", description = "Compress the output HDFS Hadoop file")
+	  private boolean isCompression = false;
 
 	public String getIn() {
 		return in;
@@ -24,5 +27,13 @@ public class ImportCommandLine {
 
 	public void setOut(String out) {
 		this.out = out;
+	}
+
+	public boolean isCompression() {
+		return isCompression;
+	}
+
+	public void setIsCompression(boolean isCompression) {
+		this.isCompression = isCompression;
 	}
 }

@@ -102,7 +102,7 @@ public class HadoopStatsCmd extends Configured implements Tool {
 		String outDirName = args[1];
 
 		// add input files to mapreduce processing
-		FileInputFormat.addInputPath(job, new Path(srcFileName));
+		FileInputFormat.addInputPath(job, new Path(srcFileName + "/data"));
 		job.setInputFormatClass(SequenceFileInputFormat.class);
 
 		// set output file
