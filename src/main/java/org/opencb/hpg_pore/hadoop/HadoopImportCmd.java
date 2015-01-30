@@ -88,7 +88,6 @@ public class HadoopImportCmd {
 				System.out.println("key = " + key);
 				try {
 					writer.append(key, value);
-			
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
