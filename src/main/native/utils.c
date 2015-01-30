@@ -139,6 +139,7 @@ void concat_seq_values(char *fastq, char *dest) {
 }
 //----------------------------------------------------------------------------- //
 
+<<<<<<< HEAD
 
 /*
 event_t *get_datasetT(hid_t fid, char *path, size_t *dataset_size) {
@@ -167,6 +168,43 @@ event_t *get_datasetT(hid_t fid, char *path, size_t *dataset_size) {
 	return events;
 }
 */
+=======
+char *get_string_attr(hid_t fid, char *path, char *attr_name) {
+  //  display_datatype(fid, path, attr_name);
+
+  char *attr_data = NULL;
+
+  hid_t group = H5Gopen2(fid, path, H5P_DEFAULT);
+  if (group < 0) {
+    printf("%s does not exist!!!\n", path);
+    attr_data = (char *) calloc(2, sizeof(char));
+    goto attr_string_done;
+  }
+
+  hid_t attr = H5Aopen(group, attr_name, H5P_DEFAULT);
+  if (attr < 0) {
+    printf("%s does not exist for %s!!!\n", attr_name, path);
+    attr_data = (char *) calloc(2, sizeof(char));
+    goto attr_string_done;
+  }
+
+  hsize_t attr_size = H5Aget_storage_size(attr);
+
+  attr_data = (char *) calloc(attr_size + 1, sizeof(char));
+
+  H5LTget_attribute_string(fid, path, attr_name, attr_data);
+
+attr_string_done:
+
+  if (attr > 0) H5Aclose(attr);
+  if (group > 0) H5Gclose(group);
+
+  return attr_data;
+  free(attr_data);
+}
+
+//----------------------------------------------------------------------------- //
+>>>>>>> c0675374ef40d86039e6a174263a7430bfeca23f
 
 char *get_dataset(hid_t fid, char *path, size_t *dataset_size) {
 	char *res;
@@ -381,6 +419,7 @@ char *get_info(char *file_image, int file_size) {
 
 char *get_fastqs(char *file_image, int file_size) {
 
+<<<<<<< HEAD
 	// open file image
 	int flags = H5LT_FILE_IMAGE_DONT_COPY & H5LT_FILE_IMAGE_DONT_RELEASE;
 	hid_t fid = H5LTopen_file_image(file_image, file_size, flags);
@@ -424,6 +463,62 @@ char *get_fastqs(char *file_image, int file_size) {
 	}
 
 	return fastq;
+=======
+  // open file image
+  int flags = H5LT_FILE_IMAGE_DONT_COPY & H5LT_FILE_IMAGE_DONT_RELEASE;
+  hid_t fid = H5LTopen_file_image(file_image, file_size, flags);
+
+  if (fid < 0) {
+    printf("Error: unable to open image file\n");
+    return NULL;
+  }
+
+  size_t size_te, size_co, size_2d, size;
+  char *fastq_te, *fastq_co, *fastq_2d, *fastq;
+
+  char* run_id = get_string_attr(fid, "/UniqueGlobalKey/tracking_id", "run_id");
+  int run_id_len = strlen(run_id);
+
+  fastq_te = get_dataset(fid, "/Analyses/Basecall_2D_000/BaseCalled_template/Fastq", &size_te);
+  fastq_co = get_dataset(fid, "/Analyses/Basecall_2D_000/BaseCalled_complement/Fastq", &size_co);
+  fastq_2d = get_dataset(fid, "/Analyses/Basecall_2D_000/BaseCalled_2D/Fastq", &size_2d);
+
+  size = size_te + size_co + size_2d + run_id_len + 100;
+  fastq = (char *) calloc(size, sizeof(char));
+
+  char *p = fastq;
+  if (fastq_te) {
+    memcpy(p, run_id, run_id_len);
+	p += run_id_len;
+    memcpy(p, "-te\n", 4);
+    p += 4;
+    memcpy(p, fastq_te, size_te);
+    p += size_te;
+    free(fastq_te);
+  }
+  if (fastq_co) {
+    memcpy(p, run_id, run_id_len);
+	p += run_id_len;
+    memcpy(p, "-co\n", 4);
+    p += 4;
+    memcpy(p, fastq_co, size_co);
+    p += size_co;
+    free(fastq_co);
+  }
+  if (fastq_2d) {
+    memcpy(p, run_id, run_id_len);
+	p += run_id_len;
+    memcpy(p, "-2D\n", 4);
+    p += 4;
+    memcpy(p, fastq_2d, size_2d);
+    p += size_2d;
+    free(fastq_2d);
+  }
+
+  free(run_id);
+
+  return fastq;
+>>>>>>> c0675374ef40d86039e6a174263a7430bfeca23f
 }
 
 //----------------------------------------------------------------------------- //

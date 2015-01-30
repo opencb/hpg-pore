@@ -2,8 +2,8 @@
 #include <jni.h>
 /* Header for class org_opencb_hadoop_pore_NativePoreSupport */
 
-#ifndef _Included_org_opencb_hadoop_pore_NativePoreSupport
-#define _Included_org_opencb_hadoop_pore_NativePoreSupport
+#ifndef _Included_org_opencb_hpg_pore_NativePoreSupport
+#define _Included_org_opencb_hpg_pore_NativePoreSupport
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -12,7 +12,7 @@ extern "C" {
  * Method:    getFastqs
  * Signature: ([B)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_org_opencb_hadoop_1pore_NativePoreSupport_getFastqs
+JNIEXPORT jstring JNICALL Java_org_opencb_hpg_1pore_NativePoreSupport_getFastqs
   (JNIEnv *, jobject, jbyteArray);
 
 /*
@@ -20,7 +20,7 @@ JNIEXPORT jstring JNICALL Java_org_opencb_hadoop_1pore_NativePoreSupport_getFast
  * Method:    getInfo
  * Signature: ([B)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_org_opencb_hadoop_1pore_NativePoreSupport_getInfo
+JNIEXPORT jstring JNICALL Java_org_opencb_hpg_1pore_NativePoreSupport_getInfo
   (JNIEnv *, jobject, jbyteArray);
 
 /*
