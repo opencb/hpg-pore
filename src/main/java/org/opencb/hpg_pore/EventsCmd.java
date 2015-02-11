@@ -13,12 +13,13 @@ import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.util.ToolRunner;
+import org.jfree.chart.JFreeChart;
 import org.opencb.hpg_pore.commandline.EventsCommandLine;
 import org.opencb.hpg_pore.hadoop.HadoopFastqCmd;
 
 import com.beust.jcommander.JCommander;
 
-public class EvetnsCmd {
+public class EventsCmd {
 	
 	public static String outDir;
 	//-----------------------------------------------------------------------//
@@ -39,128 +40,121 @@ public class EvetnsCmd {
 		}
 
 		if (cmdLine.isHadoop()) {
-			runHadoopEventsCmd(cmdLine.getSrc(), cmdLine.getOut());
+			runHadoopEventsCmd(cmdLine.getSrc(), cmdLine.getOut(), cmdLine.getmin(), cmdLine.getmax());
 		} else {
-			runLocalEventsCmd(cmdLine.getSrc(), cmdLine.getOut());
+			runLocalEventsCmd(cmdLine.getSrc(), cmdLine.getOut(), cmdLine.getmin(), cmdLine.getmax());
 		}		
 	}
 
 	//-----------------------------------------------------------------------//
-	//  local Events command                                               //
+	//  local Events command                                                 //
 	//-----------------------------------------------------------------------//
-
 	
-	private static void runLocalEventsCmd(String in, String out) {	
+	private static void runLocalEventsCmd(String in, String out, int min, int max) throws IOException {	
 		File inFile = new File(in);
 		if (!inFile.exists()) {
 			System.out.println("Error: Local directory " + in + " does not exist!");
 			System.exit(-1);						
 		}
 
+		NativePoreSupport.loadLibrary();
 		outDir = out;
 		
-		NativePoreSupport.loadLibrary();
+		/*******************************
+		// T E M P L A T E
+		 *****************************/
 		
-		// initialize PrintWriter map
-		HashMap<String, PrintWriter> events = new HashMap<String, PrintWriter>();
-
-		// process file depending on File or Folder
-		if (inFile.isDirectory()) {
-			processLocalDir(inFile, events);
-		} else if (inFile.isFile()) {
-			processLocalFile(inFile, events);
-		}
+		String events = null;
+		events = new NativePoreSupport().getEvents(Utils.read(inFile), "template", min, max);
+		if(events != null){
+			//parsear la señal
+			String sFichero = outDir +"/template_Events.txt";
 		
-		// close events
-		for (String name: events.keySet()) {
-			events.get(name).close();
-		}
-	}
-
-	//-----------------------------------------------------------------------//
-	
-	private static void writeToLocalFile(String name, String content, HashMap<String, PrintWriter> writers) throws IOException {
-		
-		PrintWriter writer = null;
-		if (!writers.containsKey(name)) {
-			String[] fields = name.split("-");
-			File auxFile = new File(outDir + "/" + fields[0]);
-			if (!auxFile.exists()) {
-				auxFile.mkdir();
+			PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(sFichero, false)));
+			String[] linea;
+			String[] lineas = events.split("\n");
+			
+			for (int i = 0 ; i< lineas.length; i++){
+				linea = lineas[i].split("\t");
+				for (int j = 0; j<linea.length;j++){
+					writer.print(linea[j] + "\t");
+				}
+				writer.print("\n");
 			}
+			writer.close();	
 			
-			auxFile = new File(auxFile.getAbsolutePath() + "/" + Utils.toModeString(fields[1]) + ".fq");
-			writer = new PrintWriter(new BufferedWriter(new FileWriter(auxFile.getAbsolutePath(), false))); //true)));
-
-			writers.put(name, writer);
+		}else{
+			
+			System.out.println("There is no template event type");
 		}
-		writer = writers.get(name);
-		writer.print(content);		
+		
+		/**********************************
+		// C O M P L E M E N T
+		 **********************************/
+		events = null;
+		events = new NativePoreSupport().getEvents(Utils.read(inFile), "complement", min, max);
+		
+		if(events != null){
+			//parsear la señal
+			String sFichero = outDir +"/complement_Events.txt";
+		
+			PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(sFichero, false)));
+			String[] linea;
+			String[] lineas = events.split("\n");
+			
+			for (int i = 0 ; i< lineas.length; i++){
+				linea = lineas[i].split("\t");
+				for (int j = 0; j<linea.length;j++){
+					writer.print(linea[j] + "\t");
+				}
+				writer.print("\n");
+			}
+			writer.close();
+			
+		}else{
+			
+			System.out.println("There is no complement event type");
+		}
+		
+		/***********************************
+		// 2 D
+		*************************************/
+		events = null;
+		events = new NativePoreSupport().getEvents(Utils.read(inFile), "2D", min, max);
+		if(events != null){
+			//parsear la señal
+			
+			//parsear la señal
+			String sFichero = outDir +"/2D_Events.txt";
+		
+			PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(sFichero, false)));
+			String[] linea;
+			String[] lineas = events.split("\n");
+			
+			for (int i = 0 ; i< lineas.length; i++){
+				linea = lineas[i].split("\t");
+				for (int j = 0; j<linea.length;j++){
+					writer.print(linea[j] + "\t");
+				}
+				writer.print("\n");
+			}
+			writer.close();
+				
+			
+		}else{
+			
+			System.out.println("There is no 2D event type");
+		}
+	
+		
 	}
 	
-	//-----------------------------------------------------------------------//
-
-	private static void processLocalFile(File inFile, HashMap<String, PrintWriter> events) {
-		
-		String fastqs = null;
-		fastqs = new NativePoreSupport().getFastqs(Utils.read(inFile));		
-		//System.out.println(fastqs);
-
-		String name, line, content;
-		String[] lines = fastqs.split("\n");
-
-		for (int i = 0; i < lines.length; i += 5) {
-			// first line: runId & template/complement/2d				
-			line = lines[i];
-			System.out.println(i + " of " + lines.length + " : " + line);
-			name = new String(line);
-
-			if (i + 1 >= lines.length) break;
-			
-			// second line: read ID
-			line = lines[i + 1];
-			content = new String(line + "\n");
-
-			// third line: nucleotides
-			line = lines[i + 2];
-			content = content.concat(line).concat("\n");
-			
-			// third line: nucleotides
-			line = lines[i + 3];
-			content = content.concat(line).concat("\n");
-
-			// third line: nucleotides
-			line = lines[i + 4];
-			content = content.concat(line).concat("\n");
-
-			// write to file
-			try {
-				writeToLocalFile(name, content, events);
-			} catch (Exception e) {
-				System.out.println("Error writing fasta sequences from " + inFile.getAbsolutePath());
-			}
-			//multipleOutputs.write(NullWritable.get(), content, name);
-		}
-	}
-
-	//-----------------------------------------------------------------------//
-
-	private static void processLocalDir(File inDir, HashMap<String, PrintWriter> events) {
-		for (final File fileEntry : inDir.listFiles()) {
-			if (fileEntry.isDirectory()) {
-				processLocalDir(fileEntry, events);
-	            //listFilesForFolder(fileEntry);
-	        } else {
-	        	processLocalFile(fileEntry, events);
-	        }
-	    }
-	}
 
 	//-----------------------------------------------------------------------//
 	//  hadoop Events command                                              //
 	//-----------------------------------------------------------------------//
 
-	private static void runHadoopEventsCmd(String in, String out) throws Exception {
+	private static void runHadoopEventsCmd(String in, String out, int min, int max) throws Exception {
 		Configuration conf = new Configuration();
 		FileSystem fs = FileSystem.get(conf);
 
