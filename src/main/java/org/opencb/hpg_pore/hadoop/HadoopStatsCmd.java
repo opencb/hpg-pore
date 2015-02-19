@@ -58,6 +58,10 @@ public class HadoopStatsCmd extends Configured implements Tool {
 			} else {
 				runId = new Text("run-id-unknown");
 			}
+			
+			//info = new NativePoreSupport().getFastqs(value.getBytes());
+			//Utils.parseAndInitStatsQualities(info, stats);
+			
 			context.write(runId, stats);
 		}
 	}
@@ -118,38 +122,4 @@ public class HadoopStatsCmd extends Configured implements Tool {
 
 		return (job.waitForCompletion(true) ? 0 : 1);
 	}
-
-	/*
-		{
-			HashMap<Double, Double> map = new HashMap<Double, Double>();
-
-			map.put(42126.649600000004, 106.01406509519562);
-			map.put(42126.909, 104.280791015625);
-			map.put(42126.935000000005, 89.49470374561915);
-			map.put(42126.9564, 95.37134024378766);
-			map.put(42126.973000000005, 93.61251678466796);
-			map.put(42126.981, 97.90542332848837);
-			map.put(42126.9982, 101.80486384901889);
-			map.put(42127.154, 103.66451843261717);
-			map.put(42127.166000000005, 102.26012236359831);
-			map.put(42127.3314, 102.95171609120825);
-			map.put(42127.3606, 98.44822291324013);
-			map.put(42127.552800000005, 91.07494995117186);
-			map.put(42127.5668, 94.50640422276086);
-			map.put(42127.5892, 99.72964179256368);
-			map.put(42127.784, 98.80370178222657);
-			map.put(42127.7944, 93.27634470086348);
-			map.put(42127.802, 97.78277201592167);
-			map.put(42127.833600000005, 93.55597003439198);
-			map.put(42127.8428, 95.94762369791667);
-
-			String outLocalDir = "/tmp/pore";
-			int width = 1024;
-			int height = 480;
-
-			JFreeChart chart = Utils.plotSignalChart(map, "Signal for XXX, [2-30] sec.", "measured signal", "time");
-			Utils.saveChart(chart, width, height, outLocalDir + "/signal.jpg");
-			System.exit(0);
-		}
-	 */
 }

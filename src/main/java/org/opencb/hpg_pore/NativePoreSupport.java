@@ -7,6 +7,7 @@ import java.net.UnknownHostException;
 public class NativePoreSupport {
 	public native String getFastqs(byte[] img);
 	public native String getInfo(byte[] img);
+	public native String getEvents(byte[] img, String src, int min, int max);
 	
 	public static void loadLibrary() {
 		System.out.println("-----> loading libs..");

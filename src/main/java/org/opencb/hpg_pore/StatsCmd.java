@@ -4,17 +4,18 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.util.ToolRunner;
 import org.opencb.hpg_pore.commandline.StatsCommandLine;
 import org.opencb.hpg_pore.hadoop.HadoopStatsCmd;
 import org.opencb.hpg_pore.hadoop.StatsWritable;
+import org.opencb.hpg_pore.hadoop.StatsWritable.BasicStats;
 
 import com.beust.jcommander.JCommander;
 
@@ -70,14 +71,36 @@ public class StatsCmd {
 
 		// print results and charts
 		printResults(statsMap, out);
+		// Draw the grafics
+		drawResults(statsMap,out);
+		
 	}
 
 	//-----------------------------------------------------------------------//
 
 	private static void printResults(HashMap<String, StatsWritable> statsMap, String outDir) {
-		String rawFileName = outDir + "/raw.txt";
-
+		
+		String summaryFileName = outDir + "/summary.txt";
+		
 		try {
+			PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(summaryFileName, false)));
+			for(String key: statsMap.keySet()) {
+				writer.print(Utils.createSummaryFile(statsMap.get(key), key));
+			}
+			writer.close();		
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("Error writing statitics results to the output folder :" + outDir);
+		}
+		
+		
+		//PrintWriter writer = new PrintWriter(outDir + "/summary.txt", "UTF-8");
+/********
+ * IGUAL DECIDIMOS NO HACER EL RAW EN LOCAL!!
+ *************/
+		//String rawFileName = outDir + "/raw.txt";
+	/*	try {
 			PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(rawFileName, false)));
 			for(String key: statsMap.keySet()) {
 				writer.print(key);
@@ -90,22 +113,45 @@ public class StatsCmd {
 			e.printStackTrace();
 			System.out.println("Error writing statitics results to the output folder :" + outDir);
 		}
+		*/
 	}
 
 	//-----------------------------------------------------------------------//
 
 	private static void processLocalFile(File inFile, HashMap<String, StatsWritable> statsMap) {
 
-		String info = new NativePoreSupport().getInfo(Utils.read(inFile));		
-
+		byte[] content = Utils.read(inFile);
+		String info = new NativePoreSupport().getInfo(content);		
+		if (info == null) {
+			System.out.println("Error reading file " + inFile.getAbsolutePath() + ". Maybe, the file is corrupt.");
+			return;
+		}
+		System.out.println("getInfo:");
+		System.out.println(info);
+		
 		StatsWritable stats = new StatsWritable();
-		String runId = stats.parseAndInit(info);
-
+		
+		String runId = Utils.getValue("run_id", info);
+		
+		String fastqs = new NativePoreSupport().getFastqs(content);
+		Utils.parseAndInitStats(info, fastqs, stats);
+		
+		System.out.println("runId = " + runId + "\n");
+		//System.out.println("channel_number = " + channel +"\n");
+		//System.out.println("time_stamp = " + timeStamp +"\nStats:");
+		
+		//System.out.println(info);
 		if (!statsMap.containsKey(runId)) {
 			statsMap.put(runId, stats);
 		} else {
 			statsMap.get(runId).update(stats);
+			//System.out.println(stats.toFormat());
 		}
+		//System.out.println(stats.toFormat());
+		
+		/************************************************************************************
+
+		*/
 	}
 
 	//-----------------------------------------------------------------------//
@@ -120,6 +166,23 @@ public class StatsCmd {
 		}
 	}
 
+	
+	//-----------------------------------------------------------------------//
+	
+	private static void drawResults(HashMap<String, StatsWritable> statsMap, String outDir) {
+		try {
+			
+			for(String key: statsMap.keySet()) {
+				(statsMap.get(key)).draw(key, outDir);	
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("Error drawing statitics results to the output folder :" + outDir);
+		}
+		
+		
+	}
 	//-----------------------------------------------------------------------//
 	//  hadoop stats command                                                 //
 	//-----------------------------------------------------------------------//

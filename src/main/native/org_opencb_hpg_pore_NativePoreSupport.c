@@ -41,21 +41,23 @@ JNIEXPORT jstring JNICALL Java_org_opencb_hpg_1pore_NativePoreSupport_getInfo(JN
 
 //------------------------------------------------------------------------------//
 
-JNIEXPORT jstring JNICALL Java_org_opencb_hadoop_1pore_NativePoreSupport_getEvents
+JNIEXPORT jstring JNICALL Java_org_opencb_hpg_1pore_NativePoreSupport_getEvents
 (JNIEnv *env, jobject this, jbyteArray array, jstring source, jint startTime, jint endTime) {
 
 	char *buffer = (*env)->GetByteArrayElements(env, array, NULL);
 	int buffer_size = (*env)->GetArrayLength(env, array);
-	char *src = (*env)->GetByteArrayElements(env, source, NULL);
+	char *src = (*env)->GetStringUTFChars(env, source, 0);
 	int start_time = startTime;
 	int end_time = endTime;
 
 	char *events = get_events(buffer, buffer_size, src, start_time, end_time);
 
-	jstring res = (*env)->NewStringUTF(env, evnnts);
+
+	jstring res = (*env)->NewStringUTF(env, events);
 
 	// free memory
 	if (buffer) (*env)->ReleaseByteArrayElements(env, array, buffer, 0);
+	(*env)->ReleaseStringUTFChars(env, source, src);
 	if (events) free(events);
 
 	// return

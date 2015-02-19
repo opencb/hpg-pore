@@ -20,7 +20,6 @@ public class Main {
 			newArgs[i-1] = new String(args[i]);
 		}	
 
-
 		if (cmd.equalsIgnoreCase("import")) {
 			HadoopImportCmd.run(newArgs);
 		} else if (cmd.equalsIgnoreCase("stats")){
@@ -33,6 +32,10 @@ public class Main {
 			help();
 		} else	if (cmd.equalsIgnoreCase("version")){
 			version();
+		} else if (cmd.equalsIgnoreCase("squiggle")) {
+			SquiggleCmd.run(newArgs);
+		} else if (cmd.equalsIgnoreCase("events")) {
+			EventsCmd.run(newArgs);
 		} else {
 			System.out.println("Error: Unknown command");
 			help();
@@ -46,6 +49,7 @@ public class Main {
 		System.out.println();
 		System.out.println("\tstats     explore Fast5 reads by computing statistics and plotting charts");
 		System.out.println("\tsquiggle  plot the measured signal for a given Fast5 read");
+		System.out.println("\tevents     extract the events");
 		System.out.println("\tfastq     extract the sequences in Fastq format for a set of Fast5 reads");
 		System.out.println("\tfasta     extract the sequences in Fasta format for a set of Fast5 reads");
 		System.out.println();

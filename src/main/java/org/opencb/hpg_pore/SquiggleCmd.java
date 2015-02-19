@@ -38,11 +38,12 @@ public class SquiggleCmd {
 			cmd.usage();
 			System.exit(-1);
 		}
-
+		
 		if (cmdLine.isHadoop()) {
-			runHadoopSquiggleCmd(cmdLine.getSrc(), cmdLine.getOut());
+			runHadoopSquiggleCmd(cmdLine.getSrc(), cmdLine.getOut(), cmdLine.getmin() , cmdLine.getmax());
 		} else {
-			runLocalSquiggleCmd(cmdLine.getSrc(), cmdLine.getOut());
+			//runLocalSquiggleCmd(cmdLine.getSrc(), cmdLine.getOut(), 10, 250);
+			runLocalSquiggleCmd(cmdLine.getSrc(), cmdLine.getOut(), cmdLine.getmin(), cmdLine.getmax());
 		}		
 	}
 
@@ -51,14 +52,12 @@ public class SquiggleCmd {
 	//-----------------------------------------------------------------------//
 
 
-	private static void runLocalSquiggleCmd(String in, String out) throws IOException {	
+	private static void runLocalSquiggleCmd(String in, String out,int min, int max) throws IOException {	
 		File inFile = new File(in);
 		if (!inFile.exists()) {
 			System.out.println("Error: Local directory " + in + " does not exist!");
 			System.exit(-1);						
 		}
-
-		//outDir = out;
 
 		NativePoreSupport.loadLibrary();
 		int width = 1024;
@@ -68,19 +67,27 @@ public class SquiggleCmd {
 		// T E M P L A T E
 		 *****************************/
 		String events = null;
-		events = new NativePoreSupport().getEvents(Utils.read(inFile), "template", 0, 0);
+		events = new NativePoreSupport().getEvents(Utils.read(inFile), "template", min, max);
 		//System.out.println(events);
 		if(events != null){
 			//parsear la señal
 			HashMap<Double, Double> map = new HashMap<Double, Double>();
 			String[] linea;
 			String[] lineas = events.split("\n");
-			//for (int i = 1 ; i< lineas.length; i++){
-			for (int i = 1 ; i< 200; i++){
+			//read the first and get the start time 
+			//linea = lineas[1].split("\t");
+			//map.put(Double.parseDouble(linea[1]),Double.parseDouble(linea[0]));
+			//double starttime = Double.parseDouble(linea[0]);
+			for (int i = 1 ; i< lineas.length; i++){
+			//for (int i = 1 ; i< 200; i++){
 				//System.out.println("linea numero " + i);
 				linea = lineas[i].split("\t");
 				//System.out.println("linea[1]: "+ linea[1]+ "   linea[0]: "+linea[0]);
+				//if((Double.parseDouble(linea[0])- starttime) < max )
 				map.put(Double.parseDouble(linea[1]),Double.parseDouble(linea[0]));
+				//else{
+					
+				//}
 			}
 		
 			JFreeChart chart = Utils.plotSignalChart(map, "Signal for template", "measured signal", "time");
@@ -94,22 +101,18 @@ public class SquiggleCmd {
 		// C O M P L E M E N T
 		 **********************************/
 		events = null;
-		events = new NativePoreSupport().getEvents(Utils.read(inFile), "complement", 0, 0);
+		events = new NativePoreSupport().getEvents(Utils.read(inFile), "complement", min, max);
 		
 		if(events!= null){
 			//parsear la señal
 			HashMap<Double, Double> map = new HashMap<Double, Double>();
 			String[] linea;
 			String[]lineas = events.split("\n");
-			//for (int i = 1 ; i< lineas.length; i++){
-			for (int i = 1 ; i< 200; i++){
-				//System.out.println("linea numero " + i);
+			for (int i = 1 ; i< lineas.length; i++){
+			//for (int i = 1 ; i< 200; i++){
 				linea = lineas[i].split("\t");
-				//System.out.println("linea[1]: "+ linea[1]+ "   linea[0]: "+linea[0]);
 				map.put(Double.parseDouble(linea[1]),Double.parseDouble(linea[0]));
 			}
-			
-	
 			JFreeChart chart = Utils.plotSignalChart(map, "Signal for Complement", "measured signal", "time");
 			Utils.saveChart(chart, width, height, out + "/complement_signal.jpg");
 		}else{
@@ -121,20 +124,17 @@ public class SquiggleCmd {
 		// 2 D
 		*************************************/
 		events = null;
-		events = new NativePoreSupport().getEvents(Utils.read(inFile), "2D", 0, 0);
+		events = new NativePoreSupport().getEvents(Utils.read(inFile), "2D", min, max);
 		if(events !=null){
 			//parsear la señal
 			HashMap<Double, Double> map = new HashMap<Double, Double>();
 			String[] linea;
 			String[] lineas = events.split("\n");
-			//for (int i = 1 ; i< lineas.length; i++){
-				for (int i = 1 ; i< 200; i++){
-				//System.out.println("linea numero " + i);
+			for (int i = 1 ; i< lineas.length; i++){
+				//for (int i = 1 ; i< 200; i++){
 				linea = lineas[i].split("\t");
-				//System.out.println("linea[1]: "+ linea[1]+ "   linea[0]: "+linea[0]);
 				map.put(Double.parseDouble(linea[1]),Double.parseDouble(linea[0]));
 			}
-			
 	
 			JFreeChart chart = Utils.plotSignalChart(map, "Signal for 2D", "measured signal", "time");
 			Utils.saveChart(chart, width, height, out + "/2D_signal.jpg");
@@ -231,7 +231,7 @@ public class SquiggleCmd {
 	//  hadoop squiggle command                                              //
 	//-----------------------------------------------------------------------//
 
-	private static void runHadoopSquiggleCmd(String in, String out) throws Exception {
+	private static void runHadoopSquiggleCmd(String in, String out, int min, int max) throws Exception {
 		Configuration conf = new Configuration();
 		FileSystem fs = FileSystem.get(conf);
 

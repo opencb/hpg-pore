@@ -139,36 +139,8 @@ void concat_seq_values(char *fastq, char *dest) {
 }
 //----------------------------------------------------------------------------- //
 
-<<<<<<< HEAD
-
-/*
-event_t *get_datasetT(hid_t fid, char *path, size_t *dataset_size) {
-
-	 herr_t     status;
-	 hsize_t    num_cols;
-	 hsize_t    num_rows;
-
-	/* Get table info  */
-	/*status = H5TBget_table_info (fid, path, &num_cols, &num_rows);
 
 
-	printf("Table %s has %d cols and %d rows\n",path, (int)num_cols, (int)num_rows);
-
-	event_t event, events[num_rows];
-	printf("table size = %i\n", sizeof(events));
-
-	//status = H5TBread_table(fid, path, sizeof(event_t), event_offsets, event_sizes, events);
-
-	printf("(mean, start) = (%0.2f, %0.2f)\n", events[8081].mean, events[8081].start);
-
-
-	status = H5TBread_records(fid, path, 7840, 1, sizeof(event_t), event_offsets, event_sizes, &event);
-	printf("(mean, start) = (%0.2f, %0.2f)\n", event.mean, event.start);
-
-	return events;
-}
-*/
-=======
 char *get_string_attr(hid_t fid, char *path, char *attr_name) {
   //  display_datatype(fid, path, attr_name);
 
@@ -204,7 +176,6 @@ attr_string_done:
 }
 
 //----------------------------------------------------------------------------- //
->>>>>>> c0675374ef40d86039e6a174263a7430bfeca23f
 
 char *get_dataset(hid_t fid, char *path, size_t *dataset_size) {
 	char *res;
@@ -231,6 +202,10 @@ char *get_dataset(hid_t fid, char *path, size_t *dataset_size) {
 	}
 
 	*dataset_size = data_size;
+
+	// closing...
+	if (dset_id > 0) H5Dclose(dset_id);
+
 	return res;
 }
 
@@ -263,6 +238,11 @@ void concat_float_attr(hid_t fid, char *path, char *attr_name, char *dest) {
 
 	float_done:
 	concat_string(attr_name, attr_data, dest);
+
+	// closing...
+	if (attr > 0) H5Aclose(attr);
+	if (group > 0) H5Gclose(group);
+
 }
 
 //----------------------------------------------------------------------------- //
@@ -292,6 +272,11 @@ void concat_int_attr(hid_t fid, char *path, char *attr_name, char *dest) {
 
 	int_done:
 	concat_string(attr_name, attr_data, dest);
+
+	// closing...
+	if (attr > 0) H5Aclose(attr);
+	if (group > 0) H5Gclose(group);
+
 }
 
 //----------------------------------------------------------------------------- //
@@ -326,6 +311,7 @@ void concat_string_attr(hid_t fid, char *path, char *attr_name, char *dest) {
 
 	free(attr_data);
 
+	// closing...
 	if (attr > 0) H5Aclose(attr);
 	if (group > 0) H5Gclose(group);
 }
@@ -372,6 +358,7 @@ char *get_info(char *file_image, int file_size) {
 	size_t info_size = strlen(info);
 	size_t aux = (size_te + size_co + size_2d) / 2;
 
+
 	if (info_size + aux >= alloc_info_size) {
 		alloc_info_size = info_size + aux + 512;
 		char *aux = (char *) calloc(alloc_info_size, sizeof(char));
@@ -387,7 +374,7 @@ char *get_info(char *file_image, int file_size) {
 		concat_int_attr(fid, "/Analyses/Basecall_2D_000/Summary/basecall_1d_template", "called_events", info);
 		concat_int_attr(fid, "/Analyses/Basecall_2D_000/Summary/basecall_1d_template", "num_events", info);
 
-		concat_seq_values(fastq_te, info);
+		//concat_seq_values(fastq_te, info);
 		free(fastq_te);
 	}
 
@@ -398,7 +385,7 @@ char *get_info(char *file_image, int file_size) {
 		concat_int_attr(fid, "/Analyses/Basecall_2D_000/Summary/basecall_1d_complement", "called_events", info);
 		concat_int_attr(fid, "/Analyses/Basecall_2D_000/Summary/basecall_1d_complement", "num_events", info);
 
-		concat_seq_values(fastq_co, info);
+		//concat_seq_values(fastq_co, info);
 		free(fastq_co);
 	}
 
@@ -408,9 +395,12 @@ char *get_info(char *file_image, int file_size) {
 		concat_float_attr(fid, "/Analyses/Basecall_2D_000/Summary/basecall_2d", "mean_qscore", info);
 		concat_int_attr(fid, "/Analyses/Basecall_2D_000/Summary/basecall_2d", "sequence_length", info);
 
-		concat_seq_values(fastq_2d, info);
+		//concat_seq_values(fastq_2d, info);
 		free(fastq_2d);
 	}
+
+	// close file image
+	H5Fclose(fid);
 
 	return info;
 }
@@ -419,51 +409,6 @@ char *get_info(char *file_image, int file_size) {
 
 char *get_fastqs(char *file_image, int file_size) {
 
-<<<<<<< HEAD
-	// open file image
-	int flags = H5LT_FILE_IMAGE_DONT_COPY & H5LT_FILE_IMAGE_DONT_RELEASE;
-	hid_t fid = H5LTopen_file_image(file_image, file_size, flags);
-
-	if (fid < 0) {
-		printf("Error: unable to open image file\n");
-		return NULL;
-	}
-
-	size_t size_te, size_co, size_2d, size;
-	char *fastq_te, *fastq_co, *fastq_2d, *fastq;
-
-	fastq_te = get_dataset(fid, "/Analyses/Basecall_2D_000/BaseCalled_template/Fastq", &size_te);
-	fastq_co = get_dataset(fid, "/Analyses/Basecall_2D_000/BaseCalled_complement/Fastq", &size_co);
-	fastq_2d = get_dataset(fid, "/Analyses/Basecall_2D_000/BaseCalled_2D/Fastq", &size_2d);
-
-	size = size_te + size_co + size_2d + 100;
-	fastq = (char *) calloc(size, sizeof(char));
-
-	char *p = fastq;
-	if (fastq_te) {
-		memcpy(p, "-te\n", 3);
-		p += 3;
-		memcpy(p, fastq_te, size_te);
-		p += size_te;
-		free(fastq_te);
-	}
-	if (fastq_co) {
-		memcpy(p, "-co\n", 3);
-		p += 3;
-		memcpy(p, fastq_co, size_co);
-		p += size_co;
-		free(fastq_co);
-	}
-	if (fastq_2d) {
-		memcpy(p, "-2d\n", 3);
-		p += 3;
-		memcpy(p, fastq_2d, size_2d);
-		p += size_2d;
-		free(fastq_2d);
-	}
-
-	return fastq;
-=======
   // open file image
   int flags = H5LT_FILE_IMAGE_DONT_COPY & H5LT_FILE_IMAGE_DONT_RELEASE;
   hid_t fid = H5LTopen_file_image(file_image, file_size, flags);
@@ -517,13 +462,15 @@ char *get_fastqs(char *file_image, int file_size) {
 
   free(run_id);
 
+  // close file image
+  H5Fclose(fid);
+
   return fastq;
->>>>>>> c0675374ef40d86039e6a174263a7430bfeca23f
 }
 
 //----------------------------------------------------------------------------- //
 
-// src = complement, template,
+// src = complement, template,2d
 // if start_time and end_time are 0, all events
 
 
@@ -559,6 +506,7 @@ size_t event_sizes[NUM_FIELDS] = { sizeof(double),
                                     sizeof(double),
                                     sizeof(double),
                                     sizeof(int)};
+
 char *get_events(char *file_image, int file_size, char *src, int start_time, int end_time) {
 
 	// open file image
@@ -574,41 +522,85 @@ char *get_events(char *file_image, int file_size, char *src, int start_time, int
 	hsize_t    num_cols;
 	hsize_t    num_rows;
 
-	/* Get table info  */
 
 	char *path;
 	if (!strcmp (src,"template")) {
 		path = "/Analyses/Basecall_2D_000/BaseCalled_template/Events";
-	}else if (!strcmp (src,"complement")) {
+
+	} else if (!strcmp (src,"2D")) {
+		path = "/Analyses/Basecall_2D_000/BaseCalled_2D/Events";
+
+	} else if (!strcmp (src,"complement")) {
 		path = "/Analyses/Basecall_2D_000/BaseCalled_complement/Events";
+
 	}
-	status = H5TBget_table_info (fid, path, &num_cols, &num_rows);
+	/* check if the file exist*/
+	/*H5G_loc_t	 loc;
+	H5G_loc_t	 dset_loc;
+	H5G_loc_reset(&dset_loc);
+	H5TRACE3("i", "i*si", fid, path, H5P_DATASET_ACCESS_DEFAULT);
+	if(H5G_loc_find(&loc, path, &dset_loc, H5P_DATASET_ACCESS_DEFAULT, H5AC_dxpl_id) < 0){
+		printf ("paso por aqui dentro H5AC... \n");
+		return NULL;
+	}*/
+	/*hid_t did = H5I_BADID;
+	if (( did = H5Dopen2 (fid, path, H5P_DEFAULT))<0){
+
+		return NULL;
+	}*/
+
+	/* Get table info  */
+	if((status = H5TBget_table_info (fid, path, &num_cols, &num_rows))<0){
+		return NULL;
+	}
 
 	printf("Table %s has %d cols and %d rows\n",path, (int)num_cols, (int)num_rows);
 
 
 	size_t size;
 	event_t eventsTable[num_rows];
+
+	/*Get events table*/
 	status = H5TBread_table(fid, path, sizeof(event_t), event_offsets, event_sizes, eventsTable);
-/*
-	event_t event, events[num_rows];
-		printf("table size = %i\n", sizeof(events));
 
-		//status = H5TBread_table(fid, path, sizeof(event_t), event_offsets, event_sizes, events);
+	char *events = (char *) calloc(sizeof(event_t)*num_rows*2, sizeof(char));
+	if( start_time > end_time) {
+		//I think the people not is a retard people, I think they has wrong
+		int aux = start_time;
+		start_time = end_time;
+		end_time = aux;
+	}
+	int final = 0;
+	int principio = 0;
+	if(end_time !=0){
+		double start = eventsTable[0].start;
 
-		printf("(mean, start) = (%0.2f, %0.2f)\n", events[8081].mean, events[8081].start);
+		if(end_time > eventsTable[num_rows-1].start -start){
+			final = eventsTable[num_rows-1].start-start;
+		}else{
+			final = start + end_time;
+		}
+		if (start_time > 0){
+			start = start + start_time;
+			if((eventsTable[num_rows-1].start) > start){//check if final is higth than start-time
+				while ( eventsTable[principio].start < start){
+					principio++;
+				}
+			}else{
+				return NULL;
+			}
 
+		}
 
-		status = H5TBread_records(fid, path, 7840, 1, sizeof(event_t), event_offsets, event_sizes, &event);
-		printf("(mean, start) = (%0.2f, %0.2f)\n", event.mean, event.start);
-*/
-
-	char *events = (char *) calloc(sizeof(event_t)*num_rows, sizeof(char));
-
+	}else {
+		final = eventsTable[num_rows-1].start;
+	}
 	char *p = events;
-	char *cabecera = "mean\tstart\tstdv\tlength\tmodel_state\tmodel_level\tmove\tp_model_state\tmp_state\p_mp_state\tp_A\tp_C\tp_G\tp_G\tp_T\traw_index\n";
+	char *cabecera = "mean\tstart\tstdv\tlength\tmodel_state\tmodel_level\tmove\tp_model_state\tmp_state\tp_mp_state\tp_A\tp_C\tp_G\tp_G\tp_T\traw_index\n";
 	memcpy(p, cabecera, 200);
-	for (int i=0; i< num_rows; i++){
+
+	int i = principio;
+	while (eventsTable [i].start <= final){
 		concat_doubleT(eventsTable[i].mean,p);
 		concat_doubleT(eventsTable[i].start,p);
 		concat_doubleT(eventsTable[i].stdv,p);
@@ -628,9 +620,10 @@ char *get_events(char *file_image, int file_size, char *src, int start_time, int
 		concat_doubleT(eventsTable[i].p_T,p);
 		concat_intT(eventsTable[i].raw_index,p);
 		strcat(p, "\n");
+		i++;
 	}
 
-	printf("size = %i, strlen = %i\n", sizeof(event_t)*num_rows, strlen(p));
+	//printf("size = %i, strlen = %i\n", sizeof(event_t)*num_rows, strlen(p));
 
 
 	/*char *p = events;
@@ -648,6 +641,9 @@ char *get_events(char *file_image, int file_size, char *src, int start_time, int
 		p += size_co;
 		free(events_co);
 	}*/
+
+	// close file image
+	H5Fclose(fid);
 
 	return events;
 }

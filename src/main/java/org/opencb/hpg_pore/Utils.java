@@ -9,7 +9,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -26,6 +25,7 @@ import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import org.opencb.hpg_pore.hadoop.ParamsforDraw;
 import org.opencb.hpg_pore.hadoop.StatsWritable;
 import org.opencb.hpg_pore.hadoop.StatsWritable.BasicStats;
 
@@ -104,7 +104,7 @@ public class Utils {
 			stats.maxSeqLength = value;
 			stats.lengthMap.put(value, 1);
 			if (startTime > -1) {
-				stats.yieldMap.put(startTime, (long) value);
+				stats.yieldMap.put(startTime, value);
 			}
 		}
 
@@ -161,6 +161,8 @@ public class Utils {
 		ChartUtilities.saveChartAsJPEG(file, chart, width, height);
 	}
 
+
+
 	public static JFreeChart plotChannelChart(HashMap<Integer, Integer> map,
 			String title, String yLabel) {
 
@@ -179,7 +181,6 @@ public class Utils {
 
 		return chart;
 	}
-
 	public static JFreeChart plotHistogram(HashMap<Integer, Integer> map, String title, String xLabel, String yLabel) {
 
 		final XYSeries series = new XYSeries("");
@@ -187,18 +188,33 @@ public class Utils {
 			series.add(key, (double) map.get(key));
 		}
 		final XYSeriesCollection dataset = new XYSeriesCollection(series);
+		 
+       
+		JFreeChart chart = ChartFactory.createHistogram(title, xLabel, yLabel, dataset, PlotOrientation.VERTICAL, false, true, false);
+		NumberAxis domainAxis = (NumberAxis) chart.getXYPlot().getDomainAxis(); 
+		domainAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
+		return chart;
+	}
+	public static JFreeChart plotHistogramFloat(HashMap<Float, Integer> map, String title, String xLabel, String yLabel) {
+
+		final XYSeries series = new XYSeries("");
+		for(float key: map.keySet()) {
+			series.add(key, (int) map.get(key));
+		}
+		final XYSeriesCollection dataset = new XYSeriesCollection(series);
 
 		JFreeChart chart = ChartFactory.createHistogram(title, xLabel, yLabel, dataset, PlotOrientation.VERTICAL, false, true, false);
-
+		NumberAxis domainAxis = (NumberAxis) chart.getXYPlot().getDomainAxis(); 
+		domainAxis.setRange(0, 100);
 		return chart;
 	}
 
-	public static JFreeChart plotCumulativeChart(HashMap<Integer, Integer> map, String title, String xLabel, String yLabel) {	
-		Map<Integer, Integer> treeMap = new TreeMap<Integer, Integer>(map);
+	public static JFreeChart plotCumulativeChart(HashMap<Long, Integer> map, String title, String xLabel, String yLabel) {	
+		Map<Long, Integer> treeMap = new TreeMap<Long, Integer>(map);
 
 		final XYSeries series = new XYSeries("");
 		double acc = 0, start = 0;
-		for(int key: treeMap.keySet()) {
+		for(long key: treeMap.keySet()) {
 			acc += (double) treeMap.get(key);
 			series.add((start == 0 ? 0 : key - start), acc);
 			if (start == 0) {
@@ -225,13 +241,13 @@ public class Utils {
 			x = key;
 			if (yPrev > 0) {
 				series.add(x - xStart, yPrev);
-				System.out.println(x + "\t" + yPrev);
+				
 			} else {
 				xStart = x;
 			}
 			y = treeMap.get(x);
 			series.add((x - xStart), y);
-			System.out.println((x - xStart)  + "\t" + y);
+			
 			yPrev = y;
 		}
 
@@ -245,6 +261,81 @@ public class Utils {
 		return chart;
 	}
 
+	public static JFreeChart plotXYChart(HashMap<Integer, Integer> map, String title, String xLabel, String yLabel) {	
+		Map<Integer, Integer> treeMap = new TreeMap<Integer, Integer>(map);
+
+		final XYSeries series = new XYSeries("");
+		double acc = 0; // start = 0;
+		for(int key: treeMap.keySet()) {
+			acc = (int) treeMap.get(key);
+			series.add(key , acc);
+			/*series.add((start == 0 ? 0 : key - start), acc);
+			if (start == 0) {
+				start = key;
+			}*/
+		}
+
+		final XYSeriesCollection dataset = new XYSeriesCollection(series);
+
+		JFreeChart chart = ChartFactory.createXYLineChart(title, xLabel, yLabel, dataset, PlotOrientation.VERTICAL, false, true, false);
+
+		return chart;
+	}
+	public static JFreeChart plotXYChartFloat(HashMap<Float, Integer> map, String title, String xLabel, String yLabel) {	
+		Map<Float, Integer> treeMap = new TreeMap<Float, Integer>(map);
+
+		final XYSeries series = new XYSeries("");
+		double acc = 0;
+		for(float key: treeMap.keySet()) {
+			acc = (int) treeMap.get(key);
+			series.add(key , acc);
+			
+		}
+
+		final XYSeriesCollection dataset = new XYSeriesCollection(series);
+
+		JFreeChart chart = ChartFactory.createXYLineChart(title, xLabel, yLabel, dataset, PlotOrientation.VERTICAL, false, true, false);
+
+		return chart;
+	}
+	public static JFreeChart plotNtContentChart(HashMap<Integer, ParamsforDraw> map, String title, String xLabel, String yLabel) {	
+
+		final XYSeries series = new XYSeries("% A");
+		final XYSeries series2 = new XYSeries("% C");
+		final XYSeries series3 = new XYSeries("% G");
+		final XYSeries series4 = new XYSeries("% T");
+		final XYSeries series5 = new XYSeries("% N");
+	
+		float pnumA, pnumT, pnumC, pnumG, pnumN;
+		int i = 0;
+		for(int key: map.keySet()) {
+			i++;
+			ParamsforDraw p = map.get(key);
+			int total = p.numA + p.numC + p.numG + p.numT + p.numN;
+			pnumA = 100 * p.numA / total;
+			series.add(key , pnumA);
+			pnumC = 100 * p.numC / total;
+			series2.add(key , pnumC);
+			pnumG = 100 * p.numG / total;
+			series3.add(key , pnumG);
+			pnumT = 100 * p.numT / total;
+			series4.add(key , pnumT);
+			pnumN = 100 * p.numN / total;
+			series5.add(key , pnumN);
+		
+		}
+
+		final XYSeriesCollection dataset = new XYSeriesCollection();
+		dataset.addSeries(series);
+		dataset.addSeries(series2);
+		dataset.addSeries(series3);
+		dataset.addSeries(series4);
+		dataset.addSeries(series5);
+
+		JFreeChart chart = ChartFactory.createXYLineChart(title, xLabel, yLabel, dataset, PlotOrientation.VERTICAL, true, true, false);
+
+		return chart;
+	}
 	public static String parseAndInitStats(String info, StatsWritable stats) {
 		String runId = null;
 		long startTime = -1;
@@ -276,7 +367,7 @@ public class Utils {
 			if (!v.isEmpty()) {
 				runId = new String("run-id-" + v);
 			}
-
+/*
 			// template, complement and 2D
 			index = 13;
 			for (i = index; i < lines.length; i++) {
@@ -297,11 +388,35 @@ public class Utils {
 				stats.rChannelMap.put(channel, 1);
 				stats.yChannelMap.put(channel, num_nt);
 			}
+			*/
 		}
 
 		return runId;
 	}
 
+	
+	
+	public static String createSummaryFile(StatsWritable stats, String runId) throws Exception {
+		
+		String res = new String();
+
+		res += "-----------------------------------------------------------------------";
+		res +=" Statistics for run " + runId;
+		res +="-----------------------------------------------------------------------";
+		
+		res += "Template:";
+		res += stats.sTemplate.toSummary();
+		res += "Complement: ";
+		res += stats.sComplement.toSummary();
+		res += "2D: ";
+		res += stats.s2D.toSummary();
+				
+		return res;
+	}
+	
+	
+	
+	
 	public static void parseStatsFile(String rawFileName, String outDir) throws Exception {
 		PrintWriter writer = new PrintWriter(outDir + "/summary.txt", "UTF-8");
 
@@ -432,7 +547,7 @@ public class Utils {
 					writer.println("\t\tGC: " + (100.0f * numGC / totalLength) + " %");
 
 					// plot: read length vs frequency
-					hist = new HashMap<Integer, Integer>();
+					HashMap<Integer, Integer> histread = new HashMap<Integer, Integer>();
 
 					line = in.readLine();
 					value = Integer.parseInt(line);
@@ -440,14 +555,14 @@ public class Utils {
 						for (i = 0; i < value; i++) {
 							line = in.readLine();
 							fields = line.split("\t");
-							hist.put(Integer.valueOf(fields[0]), Integer.valueOf(fields[1]));
+							histread.put(Integer.valueOf(fields[0]), Integer.valueOf(fields[1]));
 						}
-						chart = Utils.plotHistogram(hist, "Read length histogram (" + label + ")", "read length", "frequency");
+						chart = Utils.plotHistogram(histread, "Read length histogram (" + label + ")", "read length", "frequency");
 						Utils.saveChart(chart, width, height, outDir + "/" + runId + "_" + label + "_read_length.jpg");
 					}
 
 					// plot: time vs yield
-					hist = new HashMap<Integer, Integer>();
+					HashMap<Long, Integer> histLong = new HashMap<Long, Integer>();
 
 					line = in.readLine();
 					value = Integer.parseInt(line);
@@ -455,9 +570,9 @@ public class Utils {
 						for (i = 0; i < value; i++) {
 							line = in.readLine();
 							fields = line.split("\t");
-							hist.put(Integer.valueOf(fields[0]), Integer.valueOf(fields[1]));
+							histLong.put(Long.valueOf(fields[0]), Integer.valueOf(fields[1]));
 						}
-						chart = Utils.plotCumulativeChart(hist, "Cumulative yield (" + label + ")", "time (seconds)", "yield (cumulative nucleotides)");
+						chart = Utils.plotCumulativeChart(histLong, "Cumulative yield (" + label + ")", "time (seconds)", "yield (cumulative nucleotides)");
 						Utils.saveChart(chart, width, height, outDir + "/" + runId + "_" + label + "_yield.jpg");
 					}
 				}
@@ -468,5 +583,151 @@ public class Utils {
 		in.close();
 		writer.close();
 	}
+	/****************************
+	 * 
+	 * @param name param for take
+	 * @param info info of the file
+	 * @return String with the param
+	 */
+	public static String getValue(String name, String info) {
+		
+	
+			String[] lines = info.split("\n");
+			String[] fields; 
+			int i = 0;
+			fields= lines[i].split("\t");
+			while (!name.equals(fields[0]) ){
+				fields= lines[i].split("\t");
+				i++;
+			}
+		
+		return fields[1];
+	}
+	/*******************************************************************************
+	 * Parse the info with the fastq
+	 * @param info
+	 * @param stats
+	 *******************************************************************************/
+	public static void parseAndInitStats(String info, String fastq, StatsWritable stats){
+		
+		String timeStamp = Utils.getValue("time_stamp", info);
+		
+		String secuence, quality;
+		String[] lines = fastq.split("\n");
+		String[] field;		
+		
+		String channel = Utils.getValue("channel_number", info);
+		
+		if (lines.length < 5) {
+			System.out.println("Warning: None FastQ sequences found!");
+		} else {
+			int numSeq = 0;
+			int numNucleo = 0;
+			for (int i = 0; i< lines.length;i+=5){
+				secuence =lines[i+2];
+				//System.out.println("La secuencia es: "+ secuence);
+				quality = lines[i+4];
+				numSeq++;
+				numNucleo += secuence.length();
+				field =lines[i].split("-");
+				if (field[1].equals("te")){
+					
+					countletters(secuence, stats.sTemplate);
+					qualitycount(quality, stats.sTemplate);
+					updateTime(timeStamp,stats.sTemplate);
+				}else if(field[1].equals("co")){
+					
+					countletters(secuence, stats.sComplement);
+					qualitycount(quality, stats.sComplement);
+					updateTime(timeStamp,stats.sComplement);
+				}else{
+					
+					countletters(secuence, stats.s2D);
+					qualitycount(quality, stats.s2D);
+					updateTime(timeStamp,stats.s2D);
+				}
+				
+			}
+			
+			stats.rChannelMap.put(Integer.parseInt(channel),numSeq);
+			stats.yChannelMap.put(Integer.parseInt(channel), numNucleo);
+		}
+		
+	}
+	
+	public static void countletters(String secuence, BasicStats basicstat){
+		/*int count[] = new int [256];
+		for (int i = 0; i< secuence.length();i++)
+			count[secuence.charAt(i)]++;
+			basicstat.numA = count['a']+count['A'];
+			basicstat.numT = count['T']+count['t'];
+			basicstat.numG = count['G']+count['g'];
+			basicstat.numC = count['C']+count['c'];
+			basicstat.numN = count['N']+count['n'];
+			*/
+		
+		//int count[] = new int [256];
+		//System.out.println("********************** El tamaño de la secuencia es" + secuence.length());
+		
+		for (int i = 0; i< secuence.length();i++){
+			ParamsforDraw p = new ParamsforDraw();
+			if((secuence.charAt(i) == 'a')|| (secuence.charAt(i) == ('A'))){
+				basicstat.numA++;
+				p.numA++;
+			}else if((secuence.charAt(i) == 't') || (secuence.charAt(i) == ('T'))){
+				basicstat.numT++;
+				p.numT++;
+			}else if((secuence.charAt(i) == 'g') || (secuence.charAt(i) == ('G'))){
+				basicstat.numG++;
+				p.numG++;
+			}else if((secuence.charAt(i) == 'c') || (secuence.charAt(i) == ('C'))){
+				basicstat.numC++;
+				p.numC++;
+			}else {
+				basicstat.numN++;
+				p.numN++;
+			}
+			basicstat.accumulators.put(i, p);
+		}
+		basicstat.numSeqs++;
+		basicstat.accSeqLength = secuence.length();
+		basicstat.minSeqLength = secuence.length();
+		basicstat.maxSeqLength = secuence.length();
+		
+		basicstat.lengthMap.put(secuence.length(), 1);
+
+		float percent = (basicstat.numG+basicstat.numC)*100/secuence.length();
+		basicstat.numgc.put(percent, 1);
+		
+		
+	}
+	public static void qualitycount(String quality, BasicStats basicstats){
+		
+		int media =0;
+		ParamsforDraw p = new ParamsforDraw();
+		for (int i = 0; i < quality.length();i++){
+			media += quality.charAt(i);
+			p.cumul_qual = quality.charAt(i);
+			p.frequency = 1;
+
+			basicstats.updateParams(basicstats,i,p);
+		}
+		media = media/quality.length(); 
+		basicstats.meanqualitys = media;
+		// FALTA INCLUIR BASICSTATS.COMOSELLAME.CNUL_QUAL = MEDIA;
+		System.out.println("La media de la calidad es: " + media);
+		
+	}
+	public static void updateTime(String timeStamp, BasicStats basicstats){
+		try {
+			long time = Utils.date2seconds(timeStamp);
+			basicstats.yieldMap.put(time, basicstats.accSeqLength);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+
 
 }
