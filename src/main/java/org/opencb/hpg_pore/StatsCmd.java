@@ -34,6 +34,7 @@ public class StatsCmd {
 		try {
 			cmd.parse(args);
 		} catch (Exception e) {
+			
 			cmd.usage();
 			System.exit(-1);
 		}

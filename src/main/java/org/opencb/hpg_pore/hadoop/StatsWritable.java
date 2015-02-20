@@ -79,13 +79,13 @@ public class StatsWritable implements Writable {
 		out.writeInt(rChannelMap.size());
 		for(Object key:rChannelMap.keySet()) {
 			out.writeInt((Integer) key);
-			out.writeLong((Integer) rChannelMap.get(key));
+			out.writeInt((Integer) rChannelMap.get(key));
 		}
 
 		out.writeInt(yChannelMap.size());
 		for(Object key:yChannelMap.keySet()) {
 			out.writeInt((Integer) key);
-			out.writeLong((Integer) yChannelMap.get(key));
+			out.writeInt((Integer) yChannelMap.get(key));
 		}
 
 		sTemplate.write(out);
@@ -310,7 +310,21 @@ public class StatsWritable implements Writable {
 			out.writeInt(yieldMap.size());
 			for(Object key:yieldMap.keySet()) {
 				out.writeLong((Long) key);
-				out.writeLong((Integer) yieldMap.get(key));
+				out.writeInt((Integer) yieldMap.get(key));
+			}
+			
+			out.writeInt(accumulators.size());
+			for(Object key:accumulators.keySet()) {
+				out.writeInt((Integer) key);
+				ParamsforDraw p = (ParamsforDraw) accumulators.get(key);
+				p.write(out);
+			}
+			
+			out.writeInt(numgc.size());
+			for(Object key:numgc.keySet()) {
+				out.writeFloat((Float) key);
+				out.writeInt((Integer) numgc.get(key));
+				
 			}
 		}
 
@@ -339,6 +353,20 @@ public class StatsWritable implements Writable {
 			size = in.readInt();
 			for (int i = 0; i < size; i++) {
 				yieldMap.put(in.readLong(), in.readInt());
+			}
+			
+			accumulators = new HashMap <Integer, ParamsforDraw>();
+			size = in.readInt();
+			for (int i = 0; i < size; i++){
+				int key = in.readInt();
+				ParamsforDraw p = new ParamsforDraw();
+				p.readFields(in);
+				accumulators.put(key, p);
+				
+			}
+			size = in.readInt();
+			for ( int i = 0; i < size; i++){
+				numgc.put(in.readFloat(), in.readInt());
 			}
 		}
 
@@ -410,9 +438,10 @@ public class StatsWritable implements Writable {
 				res += numG + "\n";
 				res += numC + "\n";
 				res += numN + "\n";
-
-				res += lengthMap.size() + "\n";
 				res += meanqualitys/numSeqs + "\n";
+				
+				res += lengthMap.size() + "\n";
+				
 				for(Object key:lengthMap.keySet()) {
 					res += ((Integer) key) + "\t" + ((Integer) lengthMap.get(key)) + "\n";
 				}

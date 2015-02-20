@@ -48,20 +48,25 @@ public class HadoopStatsCmd extends Configured implements Tool {
 			System.out.println("***** map: key = " + key);
 
 			String info = new NativePoreSupport().getInfo(value.getBytes());
-
+			String fastqs = new NativePoreSupport().getFastqs(value.getBytes());
 			Text runId = null;
 			StatsWritable stats = new StatsWritable();
-
-			String name = Utils.parseAndInitStats(info, stats);
+				
+			if (info == null) {
+				System.out.println("Error reading file . Maybe, the file is corrupt.");
+				return;
+			}
+								
+			String name = Utils.getValue("run_id", info);
+			Utils.parseAndInitStats(info, fastqs, stats);
+			
 			if (name != null) {
 				runId = new Text(name);
 			} else {
 				runId = new Text("run-id-unknown");
 			}
 			
-			//info = new NativePoreSupport().getFastqs(value.getBytes());
-			//Utils.parseAndInitStatsQualities(info, stats);
-			
+				
 			context.write(runId, stats);
 		}
 	}
@@ -99,7 +104,7 @@ public class HadoopStatsCmd extends Configured implements Tool {
 
 	public int run(String[] args) throws Exception {
 		Configuration conf = new Configuration();
-		Job job = new Job(conf, "hadoop-pore-stats");
+		Job job = new Job(conf, "hpg-pore-stats");
 		job.setJarByClass(HadoopStatsCmd.class);
 
 		String srcFileName = args[0];
