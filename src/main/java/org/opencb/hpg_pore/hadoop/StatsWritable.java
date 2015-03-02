@@ -110,11 +110,9 @@ public class StatsWritable implements Writable {
 		* DRAW READ - CHANNEL
 		***********************************/
 		JFreeChart chartRC = Utils.plotChannelChart(this.rChannelMap, "Number of reads per channel", "reads");
-		
 		try {
 			Utils.saveChart(chartRC, width, height, out + "/" + runId + "/" + "_read_channel.jpg");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -126,7 +124,6 @@ public class StatsWritable implements Writable {
 		try {
 			Utils.saveChart(chartYC, width, height, out + "/" + runId + "/" + "_yield_channel.jpg");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -134,12 +131,11 @@ public class StatsWritable implements Writable {
 		* DRAW READ_LENGTH - FREQUENCY
 		***********************************/
 		for (int i = 0; i< 3; i++){
-			//JFreeChart chart = Utils.plotXYChart(b[i].yieldMap, "Cumulative Yield for" + basics[i], "measured signal", "time");
+			
 			JFreeChart chart = Utils.plotHistogram(b[i].lengthMap, "Read length histogram (" + basics[i] + ")", "read length", "frequency");
 			try {
 				Utils.saveChart(chart, width, height, out + "/" + runId + "/" + "_" + basics[i]+ "_read_length.jpg");
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -172,7 +168,6 @@ public class StatsWritable implements Writable {
 			try {
 				Utils.saveChart(chart, width, height, out + "/"+ runId + "/" + basics[i] + "_qualityperbase.jpg");
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -184,7 +179,6 @@ public class StatsWritable implements Writable {
 			try {
 				Utils.saveChart(chart, width, height, out + "/"+ runId + "/" + basics[i] + "_sequencecontent.jpg");
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -192,12 +186,10 @@ public class StatsWritable implements Writable {
 		 * DRAW %GC FREQUENCY
 		 ************************************/
 		for (int i= 0; i< 3; i++){
-			//JFreeChart chart = Utils.plotXYChartFloat(b[i].numgc, "Frequency - %GC("+ basics[i] + ")", "%GC", "Frequency");
 			JFreeChart chart = Utils.plotHistogramFloat(b[i].numgc, "Frequency - %GC("+ basics[i] + ")", "%GC", "Frequency");
 			try {
 				Utils.saveChart(chart, width, height, out + "/"+ runId + "/" + basics[i] + "_%GC.jpg");
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -300,6 +292,7 @@ public class StatsWritable implements Writable {
 			out.writeInt(minSeqLength);
 			out.writeInt(accSeqLength);
 			out.writeInt(maxSeqLength);
+			out.writeInt(meanqualitys);
 
 			out.writeInt(lengthMap.size());
 			for(Object key:lengthMap.keySet()) {
@@ -340,6 +333,7 @@ public class StatsWritable implements Writable {
 			minSeqLength = in.readInt();
 			accSeqLength = in.readInt();
 			maxSeqLength = in.readInt();
+			meanqualitys = in.readInt();
 
 			int size;
 
@@ -372,7 +366,8 @@ public class StatsWritable implements Writable {
 
 		public void update(BasicStats stats) {
 			if (stats.accSeqLength > 0) {
-				numSeqs++;
+				//numSeqs++;
+				numSeqs += stats.numSeqs;
 				numA += stats.numA;
 				numT += stats.numT;
 				numG += stats.numG;
@@ -382,7 +377,7 @@ public class StatsWritable implements Writable {
 				if (stats.maxSeqLength > maxSeqLength) maxSeqLength = stats.maxSeqLength;
 				accSeqLength += stats.accSeqLength;
 				
-				meanqualitys +=stats.meanqualitys;
+				meanqualitys += stats.meanqualitys;
 				int v1 = 0;
 				for(Object key:stats.lengthMap.keySet()) {
 					v1 = stats.lengthMap.get((Integer) key);
@@ -438,7 +433,7 @@ public class StatsWritable implements Writable {
 				res += numG + "\n";
 				res += numC + "\n";
 				res += numN + "\n";
-				res += meanqualitys/numSeqs + "\n";
+				res += meanqualitys + "\n";
 				
 				res += lengthMap.size() + "\n";
 				
@@ -482,7 +477,7 @@ public class StatsWritable implements Writable {
 				res += "N: " + numN + " " + String.format("%.2f", 100.0f * numN / length) + "%\n";
 
 				res += "GC: " + String.format("%.2f", 100.0f * (numG + numC) / length) + "% \n";
-
+				res += "Mean qualitys: " + meanqualitys +"\n"; 
 				if (numSeqs > 1) {
 					res += "Read length histogram:\n";
 					res += "\tLength\tFrequency\n";
@@ -519,7 +514,7 @@ public class StatsWritable implements Writable {
 			String res = new String();
 			int length = (numA + numT + numG + numC + numN);
 	
-			res += "Num. seqs: " + numSeqs + "\n";
+			res += "\n Num. seqs: " + numSeqs + "\n";
 			if (numSeqs > 0) {
 				res += "Num. total nucleotides: " + length + " (" + accSeqLength + ")\n";
 				res += "Seq. length (min, avg, max) = (" + minSeqLength + ", " + String.format("%.2f", 1.0f * accSeqLength / numSeqs) + ", " + maxSeqLength + ")\n";
@@ -532,7 +527,7 @@ public class StatsWritable implements Writable {
 				res += "\tN: " + numN + " " + String.format("%.2f", 100.0f * numN / length) + "%\n";
 	
 				res += "GC: " + String.format("%.2f", 100.0f * (numG + numC) / length) + "% \n";
-	
+				res += "Mean qualitys: " + meanqualitys/numSeqs +"\n"; 
 			}
 			return res;
 		}

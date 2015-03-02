@@ -69,7 +69,6 @@ public class Utils {
 				System.out.println("Num bytes read: " + totalBytesRead);
 			}
 			finally {
-				System.out.println("Error: Closing input stream.");
 				input.close();
 			}
 		}
@@ -87,7 +86,6 @@ public class Utils {
 		Date date = (Date) formatter.parse(str_date); 
 		long seconds = date.getTime() / 1000;
 
-		System.out.println(str_date + " = " + seconds);
 		return seconds;
 	}
 
@@ -166,7 +164,7 @@ public class Utils {
 	public static JFreeChart plotChannelChart(HashMap<Integer, Integer> map,
 			String title, String yLabel) {
 
-		int size = 512;
+		int size = 513;
 		ArrayList<Double> values = new ArrayList<Double>();
 		for(int i = 0; i < size; i++) {
 			values.add(0d);			
@@ -265,14 +263,10 @@ public class Utils {
 		Map<Integer, Integer> treeMap = new TreeMap<Integer, Integer>(map);
 
 		final XYSeries series = new XYSeries("");
-		double acc = 0; // start = 0;
+		double acc = 0; 
 		for(int key: treeMap.keySet()) {
 			acc = (int) treeMap.get(key);
 			series.add(key , acc);
-			/*series.add((start == 0 ? 0 : key - start), acc);
-			if (start == 0) {
-				start = key;
-			}*/
 		}
 
 		final XYSeriesCollection dataset = new XYSeriesCollection(series);
@@ -403,9 +397,9 @@ public class Utils {
 		
 		String res = new String();
 
-		res += "-----------------------------------------------------------------------";
+		res += "-----------------------------------------------------------------------\n";
 		res +=" Statistics for run " + runId;
-		res +="-----------------------------------------------------------------------";
+		res +="-----------------------------------------------------------------------\n";
 		
 		res += "Template:";
 		res += stats.sTemplate.toSummary();
@@ -443,188 +437,7 @@ public class Utils {
 			writer.println(" Statistics for run " + runId);
 			writer.println("-----------------------------------------------------------------------");
 
-			// skip
-			in.readLine();
-
-			// plot: channel vs num. reads
-			hist = new HashMap<Integer, Integer>();
-
-			line = in.readLine();
-			value = Integer.parseInt(line);
-			if (value > 0) {
-				for (i = 0; i < value; i++) {
-					line = in.readLine();
-					fields = line.split("\t");
-					hist.put(Integer.valueOf(fields[0]), Integer.valueOf(fields[1]));
-				}
-				chart = Utils.plotChannelChart(hist, "Number of reads per channel", "reads");
-				Utils.saveChart(chart, width, height, outDir + "/" + runId + "_channel_reads.jpg");
-			}
-
-			// skip
-			in.readLine();
-
-			// plot: channel vs yield
-			hist = new HashMap<Integer, Integer>();
-
-			line = in.readLine();
-			value = Integer.parseInt(line);
-			if (value > 0) {
-				for (i = 0; i < value; i++) {
-					line = in.readLine();
-					fields = line.split("\t");
-					hist.put(Integer.valueOf(fields[0]), Integer.valueOf(fields[1]));
-				}
-				chart = Utils.plotChannelChart(hist, "Yield per channel", "yield (nucleotides)");
-				Utils.saveChart(chart, width, height, outDir + "/" + runId + "_channel_yield.jpg");
-			}
-
-			for (int j = 0; j < 3; j++) {
-				String label = null;
-				line = in.readLine();
-				fields = line.split("\t");
-				if (fields[0].equalsIgnoreCase("-te")) {
-					label = new String("template");
-					writer.println("\nTemplate:");
-				} else if (fields[0].equalsIgnoreCase("-co")) {
-					label = new String("complement");
-					writer.println("\nComplement:");					
-				} else if (fields[0].equalsIgnoreCase("-2d")) {
-					label = new String("2d");
-					writer.println("\n2D:");
-				}
-
-				// num. seqs
-				line = in.readLine();
-				int numSeqs = Integer.parseInt(line);
-				writer.println("\tNum. seqs: " + numSeqs);
-
-				if (numSeqs > 0) {
-					// total length
-					line = in.readLine();
-					int totalLength = Integer.parseInt(line);
-					writer.println("\tNum. nucleotides: " + totalLength);
-					writer.println();
-					writer.println("\tMean read length: " + totalLength / numSeqs);
-
-					// min read length
-					line = in.readLine();
-					value = Integer.parseInt(line);
-					writer.println("\tMin. read length: " + value);
-
-					// max read length
-					line = in.readLine();
-					value = Integer.parseInt(line);
-					writer.println("\tMax. read length: " + value);
-
-					writer.println();
-					writer.println("\tNucleotides content:");
-
-					// A
-					line = in.readLine();
-					value = Integer.parseInt(line);
-					writer.println("\t\tA: " + value + " (" + (100.0f * value / totalLength) + " %)");
-
-					// T
-					line = in.readLine();
-					value = Integer.parseInt(line);
-					writer.println("\t\tT: " + value + " (" + (100.0f * value / totalLength) + " %)");
-
-					// G
-					line = in.readLine();
-					value = Integer.parseInt(line);
-					writer.println("\t\tG: " + value + " (" + (100.0f * value / totalLength) + " %)");
-					int numGC = value;
-
-					// C
-					line = in.readLine();
-					value = Integer.parseInt(line);
-					writer.println("\t\tC: " + value + " (" + (100.0f * value / totalLength) + " %)");
-					numGC += value;
-
-					// N
-					line = in.readLine();
-					value = Integer.parseInt(line);
-					writer.println("\t\tN: " + value + " (" + (100.0f * value / totalLength) + " %)");
-
-					writer.println();
-					writer.println("\t\tGC: " + (100.0f * numGC / totalLength) + " %");
-
-					// plot: read length vs frequency
-					//HashMap<Integer, Integer> histread = new HashMap<Integer, Integer>();
-					hist = new HashMap<Integer, Integer>();
-					line = in.readLine();
-					value = Integer.parseInt(line);
-					if (value > 0) {
-						for (i = 0; i < value; i++) {
-							line = in.readLine();
-							fields = line.split("\t");
-							System.out.println("/********************************************************");
-							System.out.println("Fields Read length " + fields[0] + "jdjiesjf"+ fields[1] );
-							System.out.println("***************************************************");
-						//	hist.put(Integer.valueOf(fields[0]), Integer.valueOf(fields[1]));
-						}
-						//chart = Utils.plotHistogram(hist, "Read length histogram (" + label + ")", "read length", "frequency");
-						//Utils.saveChart(chart, width, height, outDir + "/" + runId + "_" + label + "_read_length.jpg");
-					}
-
-					// plot: time vs yield
-					/*HashMap<Long, Integer> histLong = new HashMap<Long, Integer>();
-
-					line = in.readLine();
-					value = Integer.parseInt(line);
-					if (value > 0) {
-						for (i = 0; i < value; i++) {
-							line = in.readLine();
-							fields = line.split("\t");
-							histLong.put(Long.valueOf(fields[0]), Integer.valueOf(fields[1]));
-						}
-						chart = Utils.plotCumulativeChart(histLong, "Cumulative yield (" + label + ")", "time (seconds)", "yield (cumulative nucleotides)");
-						Utils.saveChart(chart, width, height, outDir + "/" + runId + "_" + label + "_yield.jpg");
-					}
-					
-					// plot: pos vs cumul_qual and pos vs numA, numT, numC, numG
-					HashMap<Integer, ParamsforDraw> histaccum = new HashMap<Integer, ParamsforDraw>();
-
-					line = in.readLine();
-					value = Integer.parseInt(line);
-					if (value > 0) {
-						for (i = 0; i < value; i++) {
-							line = in.readLine();
-							fields = line.split("\t");
-							System.out.println("fields ParamsforDraw:"+fields);
-							
-							//histaccum.put(Long.valueOf(fields[0]), Integer.valueOf(fields[1]));
-						}
-						//chart = Utils.plotCumulativeChart(histLong, "Cumulative yield (" + label + ")", "time (seconds)", "yield (cumulative nucleotides)");
-						//Utils.saveChart(chart, width, height, outDir + "/" + runId + "_" + label + "_yield.jpg");
-					}
-					
-					// plot: %gc vs frequency
-					
-					HashMap<Float, Integer> histfloat = new HashMap<Float, Integer>();
-
-					line = in.readLine();
-					value = Integer.parseInt(line);
-					if (value > 0) {
-						for (i = 0; i < value; i++) {
-							line = in.readLine();
-							fields = line.split("\t");
-							histfloat.put(Float.valueOf(fields[0]), Integer.valueOf(fields[1]));
-						}
-						//chart = Utils.plotCumulativeChart(histfloat, "Cumulative yield (" + label + ")", "time (seconds)", "yield (cumulative nucleotides)");
-						//Utils.saveChart(chart, width, height, outDir + "/" + runId + "_" + label + "_yield.jpg");
-					}
-					
-					
-				}
-			}
-
-			//break;
-		}
-		in.close();
-		writer.close();
-	}*/
+	*/
 	
 	/*********************
 	 * Nuevo
@@ -647,9 +460,8 @@ public class Utils {
 
 		BufferedReader in = new BufferedReader(new FileReader(new File(rawFileName)));
 
-		//while ((line = in.readLine()) != null) {
-	//	while ((line = in.readLine()) != null) {
-			line = in.readLine();
+		while ((line = in.readLine()) != null) {
+		
 			//runId:
 			runId = line;
 			writer.println("-----------------------------------------------------------------------");
@@ -693,8 +505,6 @@ public class Utils {
 				fields = line.split("\t");
 				if (fields[0].equalsIgnoreCase("-te")) {
 					label = new String("template");
-					System.out.println("/********************************************************");
-					System.out.println(label);
 					writer.println("\nTemplate:");
 				} else if (fields[0].equalsIgnoreCase("-co")) {
 					label = new String("complement");
@@ -763,7 +573,7 @@ public class Utils {
 					//mean qualitys
 					line = in.readLine();
 					value = Integer.parseInt(line);
-					writer.println("\t \tMean qualitys: " +  value);
+					writer.println("\t \tMean qualitys: " +  value / numSeqs);
 					
 					// plot: read length vs frequency
 					hist = new HashMap<Integer, Integer>();
@@ -803,7 +613,7 @@ public class Utils {
 						for (i = 0; i < value; i++) {
 							line = in.readLine();
 							fields = line.split("\t");
-							//System.out.println("fields ParamsforDraw:"+fields);
+							
 							ParamsforDraw p = new ParamsforDraw();
 							p.numA = Integer.parseInt(fields[3]);
 							p.numT = Integer.parseInt(fields[4]);
@@ -841,9 +651,10 @@ public class Utils {
 				
 				}
 			}//FOR
-			
-		//}WHILE
+			line = in.readLine();
+		}//WHILE
 		writer.close();
+		in.close();
 	}
 	/****************************
 	 * 
@@ -881,7 +692,7 @@ public class Utils {
 		String channel = Utils.getValue("channel_number", info);
 		
 		if (lines.length < 5) {
-			System.out.println("Warning: None FastQ sequences found!");
+			//System.out.println("Warning: None FastQ sequences found!");
 		} else {
 			int numSeq = 0;
 			int numNucleo = 0;
@@ -975,9 +786,7 @@ public class Utils {
 			basicstats.updateParams(basicstats,i,p);
 		}
 		media = media/quality.length(); 
-		basicstats.meanqualitys = media;
-		// FALTA INCLUIR BASICSTATS.COMOSELLAME.CNUL_QUAL = MEDIA;
-		System.out.println("La media de la calidad es: " + media);
+		basicstats.meanqualitys += media;
 		
 	}
 	public static void updateTime(String timeStamp, BasicStats basicstats){
@@ -985,7 +794,6 @@ public class Utils {
 			long time = Utils.date2seconds(timeStamp);
 			basicstats.yieldMap.put(time, basicstats.accSeqLength);
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		

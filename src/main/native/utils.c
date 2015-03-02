@@ -185,7 +185,7 @@ char *get_dataset(hid_t fid, char *path, size_t *dataset_size) {
 	// dataset
 	hid_t dset_id = H5Dopen2(fid, path, H5P_DEFAULT);
 	if (dset_id < 0) {
-		printf("Error: opening dataset %s\n", path);
+		//printf("Error: opening dataset %s\n", path);
 		*dataset_size = 0;
 		return NULL;
 	}
@@ -195,7 +195,7 @@ char *get_dataset(hid_t fid, char *path, size_t *dataset_size) {
 	hid_t mt_id = H5Dget_type(dset_id);
 	res = (char *) malloc(data_size * sizeof(char));
 	if (H5Dread(dset_id, mt_id, H5S_ALL, H5S_ALL, H5P_DEFAULT, res) < 0) {
-		printf("Error reading dataset\n");
+		//printf("Error reading dataset\n");
 		free(res);
 		*dataset_size = 0;
 		return NULL;
@@ -319,6 +319,10 @@ void concat_string_attr(hid_t fid, char *path, char *attr_name, char *dest) {
 //----------------------------------------------------------------------------- //
 
 char *get_info(char *file_image, int file_size) {
+
+	/* Turn off error handling */
+	H5Eset_auto(H5E_DEFAULT, NULL, NULL);
+
 	// open file image
 	int flags = H5LT_FILE_IMAGE_DONT_COPY & H5LT_FILE_IMAGE_DONT_RELEASE;
 	hid_t fid = H5LTopen_file_image(file_image, file_size, flags);
@@ -408,6 +412,9 @@ char *get_info(char *file_image, int file_size) {
 //----------------------------------------------------------------------------- //
 
 char *get_fastqs(char *file_image, int file_size) {
+
+  /* Turn off error handling */
+	H5Eset_auto(H5E_DEFAULT, NULL, NULL);
 
   // open file image
   int flags = H5LT_FILE_IMAGE_DONT_COPY & H5LT_FILE_IMAGE_DONT_RELEASE;
@@ -508,6 +515,9 @@ size_t event_sizes[NUM_FIELDS] = { sizeof(double),
                                     sizeof(int)};
 
 char *get_events(char *file_image, int file_size, char *src, int start_time, int end_time) {
+
+	/* Turn off error handling */
+	H5Eset_auto(H5E_DEFAULT, NULL, NULL);
 
 	// open file image
 	int flags = H5LT_FILE_IMAGE_DONT_COPY & H5LT_FILE_IMAGE_DONT_RELEASE;

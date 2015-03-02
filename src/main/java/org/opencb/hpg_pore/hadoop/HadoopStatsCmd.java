@@ -45,7 +45,7 @@ public class HadoopStatsCmd extends Configured implements Tool {
 		@Override
 		public void map(Text key, BytesWritable value, Context context) throws IOException, InterruptedException {
 
-			System.out.println("***** map: key = " + key);
+			//System.out.println("***** map: key = " + key);
 
 			String info = new NativePoreSupport().getInfo(value.getBytes());
 			String fastqs = new NativePoreSupport().getFastqs(value.getBytes());
@@ -80,7 +80,7 @@ public class HadoopStatsCmd extends Configured implements Tool {
 				finalStats.update(stat);
 			}
 
-			System.out.println("+++++ from combine: stats:\n" + finalStats.toString());
+			//System.out.println("+++++ from combine: stats:\n" + finalStats.toString());
 			context.write(key, finalStats);
 		}
 	}
@@ -88,16 +88,15 @@ public class HadoopStatsCmd extends Configured implements Tool {
 	public static class Reduce extends Reducer<Text, StatsWritable, Text, Text> {
 		@Override
 		public void reduce(Text key, Iterable<StatsWritable> values, Context context) throws IOException, InterruptedException {
-			System.out.println("***** reduce: key = " + key);
-
+			//System.out.println("***** reduce: key = " + key);
 			StatsWritable finalStats = new StatsWritable();
-
 			for (StatsWritable stat: values) {
 				finalStats.update(stat);
 			}
 
 			Text res = new Text(finalStats.toFormat());
-			System.out.println("+++++ from reduce: stats:\n" + finalStats.toString());
+			//System.out.println("+++++ from reduce: stats:\n" + finalStats.toString());
+			
 			context.write(key, res);
 		}
 	}
