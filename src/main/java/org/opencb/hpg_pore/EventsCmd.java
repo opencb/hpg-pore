@@ -40,9 +40,9 @@ public class EventsCmd {
 		}
 
 		if (cmdLine.isHadoop()) {
-			runHadoopEventsCmd(cmdLine.getSrc(), cmdLine.getOut(), cmdLine.getmin(), cmdLine.getmax());
+			runHadoopEventsCmd(cmdLine.getSrc(), cmdLine.getOut(), cmdLine.getlib(),cmdLine.getmin(), cmdLine.getmax());
 		} else {
-			runLocalEventsCmd(cmdLine.getSrc(), cmdLine.getOut(), cmdLine.getmin(), cmdLine.getmax());
+			runLocalEventsCmd(cmdLine.getSrc(), cmdLine.getOut(), cmdLine.getlib(),cmdLine.getmin(), cmdLine.getmax());
 		}		
 	}
 
@@ -50,14 +50,14 @@ public class EventsCmd {
 	//  local Events command                                                 //
 	//-----------------------------------------------------------------------//
 	
-	private static void runLocalEventsCmd(String in, String out, int min, int max) throws IOException {	
+	private static void runLocalEventsCmd(String in, String out, String lib, int min, int max) throws IOException {	
 		File inFile = new File(in);
 		if (!inFile.exists()) {
 			System.out.println("Error: Local directory " + in + " does not exist!");
 			System.exit(-1);						
 		}
 
-		NativePoreSupport.loadLibrary();
+		NativePoreSupport.loadLibrary(lib);
 		outDir = out;
 		
 		/*******************************
@@ -154,7 +154,7 @@ public class EventsCmd {
 	//  hadoop Events command                                              //
 	//-----------------------------------------------------------------------//
 
-	private static void runHadoopEventsCmd(String in, String out, int min, int max) throws Exception {
+	private static void runHadoopEventsCmd(String in, String out, String lib, int min, int max) throws Exception {
 		Configuration conf = new Configuration();
 		FileSystem fs = FileSystem.get(conf);
 
@@ -166,9 +166,10 @@ public class EventsCmd {
 		String outHdfsDirname = new String(in + "-" + new Date().getTime());
 		System.out.println(in + ", " + out + ", " + outHdfsDirname);
 
-		String[] args = new String[2];
+		String[] args = new String[3];
 		args[0] = new String(in);
 		args[1] = new String(outHdfsDirname);
+		args[2] = new String(lib);
 
 		// map-reduce
 		int error = ToolRunner.run(new HadoopFastqCmd(), args);

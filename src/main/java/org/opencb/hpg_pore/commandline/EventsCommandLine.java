@@ -17,13 +17,16 @@ public class EventsCommandLine {
 	  
 	  @Parameter(names = "--max", description = "Max time for stop the extrat events")
 	  private int max;
+	  
+	  @Parameter(names = "--lib", description = "Path where library is located")
+	  private String lib;
 
 	public String getSrc() {
 		return src;
 	}
 
 	public void setSrc(String in) {
-		this.src = src;
+		this.src = in;
 	}
 
 	public String getOut() {
@@ -52,5 +55,11 @@ public class EventsCommandLine {
 	}
 	public void setmax(int max){
 		this.max = max;
+	}
+	public String getlib(){
+		return lib;
+	}
+	public void setlib(String lib){
+		this.lib = lib;
 	}
 }

@@ -18,6 +18,9 @@ public class SquiggleCommandLine {
 	  
 	  @Parameter(names = "--max", description = "Max time for draw the graphic")
 	  private int max;
+	  
+	  @Parameter(names = "--lib", description = "Path where library is located")
+	  private String lib;
 
 	public String getSrc() {
 		return src;
@@ -53,5 +56,11 @@ public class SquiggleCommandLine {
 	}
 	public void setmax(int max){
 		this.max = max;
+	}
+	public String getlib(){
+		return lib;
+	}
+	public void setlib(String lib){
+		this.lib = lib;
 	}
 }

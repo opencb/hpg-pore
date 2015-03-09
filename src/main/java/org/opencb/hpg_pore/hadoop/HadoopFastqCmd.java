@@ -10,23 +10,24 @@ import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.hadoop.mapreduce.Mapper.Context;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.MultipleOutputs;
 import org.apache.hadoop.util.Tool;
-import org.opencb.hpg_pore.FastaCmd;
 import org.opencb.hpg_pore.NativePoreSupport;
 
 public class HadoopFastqCmd extends Configured implements Tool {
 	public static class Map extends Mapper<Text, BytesWritable, NullWritable, Text> {
 
 		private MultipleOutputs<NullWritable, Text> multipleOutputs = null; 
-
+		private String library;
 		@Override
 		public void setup(Context context) {
-			NativePoreSupport.loadLibrary();
+			Configuration conf = context.getConfiguration();
+			library = conf.get("lib",System.getenv("LD_LIBRARY_PATH"));
+			
+			NativePoreSupport.loadLibrary(library);
 
 			multipleOutputs = new MultipleOutputs<NullWritable, Text>(context);
 		}
@@ -89,11 +90,14 @@ public class HadoopFastqCmd extends Configured implements Tool {
 	@Override
 	public int run(String[] args) throws Exception {
 		Configuration conf = new Configuration();
+		conf.set("lib", args[2]);
+		
 		Job job = new Job(conf, "hadoop-pore-fastq");
 		job.setJarByClass(HadoopFastqCmd.class);
 
 		String srcFileName = args[0];
 		String outDirName = args[1];
+		
 
 		// add input files to mapreduce processing
 		FileInputFormat.addInputPath(job, new Path(srcFileName));

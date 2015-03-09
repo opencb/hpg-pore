@@ -1,10 +1,7 @@
 package org.opencb.hpg_pore.hadoop;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 
+import java.io.IOException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
@@ -21,25 +18,18 @@ import org.opencb.hpg_pore.NativePoreSupport;
 import org.opencb.hpg_pore.Utils;
 
 public class HadoopStatsCmd extends Configured implements Tool {
-
+		
 	public static class Map extends Mapper<Text, BytesWritable, Text, StatsWritable> {
+		private static String library;
 		@Override
 		public void setup(Context context) {
-			System.out.println("-----> loading libs..");
-			//System.load(new File("/tmp/libnativefast5.so").getAbsolutePath());
-			String hostname;
-			File poreLib = new File("/tmp/libopencb_pore.so");
-			try {
-				hostname = InetAddress.getLocalHost().getHostName();
-			} catch (UnknownHostException e) {
-				hostname = new String("no-name");
-			}
-			if (poreLib.exists()) {
-				System.out.println("*********** " + poreLib.getAbsolutePath() + " exists (" + hostname + ")");
-			} else {
-				System.out.println("*********** " + poreLib.getAbsolutePath() + " does NOT exist (" + hostname + ")");				
-			}
-			System.load(poreLib.getAbsolutePath());
+			System.out.println("-----> loading libs..");	
+			Configuration conf = context.getConfiguration();
+			library = conf.get("lib",System.getenv("LD_LIBRARY_PATH"));
+			System.out.println("La libreria es:  "+ library);
+			NativePoreSupport.loadLibrary(library);
+			
+			
 		}
 
 		@Override
@@ -103,19 +93,23 @@ public class HadoopStatsCmd extends Configured implements Tool {
 
 	public int run(String[] args) throws Exception {
 		Configuration conf = new Configuration();
+		
+		String lib = args[2];
+		System.out.println("*********************El argumento es:"+ lib);
+		conf.set("lib", lib);
 		Job job = new Job(conf, "hpg-pore-stats");
 		job.setJarByClass(HadoopStatsCmd.class);
 
 		String srcFileName = args[0];
 		String outDirName = args[1];
-
+		
 		// add input files to mapreduce processing
 		FileInputFormat.addInputPath(job, new Path(srcFileName + "/data"));
 		job.setInputFormatClass(SequenceFileInputFormat.class);
 
 		// set output file
 		FileOutputFormat.setOutputPath(job, new Path(outDirName));
-
+		
 		// set map, combine, reduce...
 		job.setMapperClass(HadoopStatsCmd.Map.class);
 		job.setCombinerClass(HadoopStatsCmd.Combine.class);

@@ -40,10 +40,10 @@ public class SquiggleCmd {
 		}
 		
 		if (cmdLine.isHadoop()) {
-			runHadoopSquiggleCmd(cmdLine.getSrc(), cmdLine.getOut(), cmdLine.getmin() , cmdLine.getmax());
+			runHadoopSquiggleCmd(cmdLine.getSrc(), cmdLine.getOut(), cmdLine.getlib(), cmdLine.getmin() , cmdLine.getmax());
 		} else {
 			//runLocalSquiggleCmd(cmdLine.getSrc(), cmdLine.getOut(), 10, 250);
-			runLocalSquiggleCmd(cmdLine.getSrc(), cmdLine.getOut(), cmdLine.getmin(), cmdLine.getmax());
+			runLocalSquiggleCmd(cmdLine.getSrc(), cmdLine.getOut(), cmdLine.getlib(), cmdLine.getmin(), cmdLine.getmax());
 		}		
 	}
 
@@ -52,14 +52,14 @@ public class SquiggleCmd {
 	//-----------------------------------------------------------------------//
 
 
-	private static void runLocalSquiggleCmd(String in, String out,int min, int max) throws IOException {	
+	private static void runLocalSquiggleCmd(String in, String out, String lib, int min, int max) throws IOException {	
 		File inFile = new File(in);
 		if (!inFile.exists()) {
 			System.out.println("Error: Local directory " + in + " does not exist!");
 			System.exit(-1);						
 		}
 
-		NativePoreSupport.loadLibrary();
+		NativePoreSupport.loadLibrary(lib);
 		int width = 1024;
 		int height = 480;
 		
@@ -148,91 +148,14 @@ public class SquiggleCmd {
 
 	}
 
-	//-----------------------------------------------------------------------//
-
-	private static void writeToLocalFile(String name, String content, HashMap<String, PrintWriter> writers) throws IOException {
-
-		PrintWriter writer = null;
-		if (!writers.containsKey(name)) {
-			String[] fields = name.split("-");
-			File auxFile = new File(outDir + "/" + fields[0]);
-			if (!auxFile.exists()) {
-				auxFile.mkdir();
-			}
-
-			auxFile = new File(auxFile.getAbsolutePath() + "/" + Utils.toModeString(fields[1]) + ".fq");
-			writer = new PrintWriter(new BufferedWriter(new FileWriter(auxFile.getAbsolutePath(), false))); //true)));
-
-			writers.put(name, writer);
-		}
-		writer = writers.get(name);
-		writer.print(content);		
-	}
-
-	//-----------------------------------------------------------------------//
-
-	private static void processLocalFile(File inFile, HashMap<String, PrintWriter> printers) {
-
-		String fastqs = null;
-		fastqs = new NativePoreSupport().getFastqs(Utils.read(inFile));		
-		//System.out.println(fastqs);
-
-		String name, line, content;
-		String[] lines = fastqs.split("\n");
-
-		for (int i = 0; i < lines.length; i += 5) {
-			// first line: runId & template/complement/2d				
-			line = lines[i];
-			System.out.println(i + " of " + lines.length + " : " + line);
-			name = new String(line);
-
-			if (i + 1 >= lines.length) break;
-
-			// second line: read ID
-			line = lines[i + 1];
-			content = new String(line + "\n");
-
-			// third line: nucleotides
-			line = lines[i + 2];
-			content = content.concat(line).concat("\n");
-
-			// third line: nucleotides
-			line = lines[i + 3];
-			content = content.concat(line).concat("\n");
-
-			// third line: nucleotides
-			line = lines[i + 4];
-			content = content.concat(line).concat("\n");
-
-			// write to file
-			try {
-				writeToLocalFile(name, content, printers);
-			} catch (Exception e) {
-				System.out.println("Error writing fasta sequences from " + inFile.getAbsolutePath());
-			}
-			//multipleOutputs.write(NullWritable.get(), content, name);
-		}
-	}
-
-	//-----------------------------------------------------------------------//
-
-	private static void processLocalDir(File inDir, HashMap<String, PrintWriter> printers) {
-		for (final File fileEntry : inDir.listFiles()) {
-			if (fileEntry.isDirectory()) {
-				processLocalDir(fileEntry, printers);
-				//listFilesForFolder(fileEntry);
-			} else {
-				processLocalFile(fileEntry, printers);
-			}
-		}
-	}
-
+	
+	
 	//-----------------------------------------------------------------------//
 	//  hadoop squiggle command                                              //
 	//-----------------------------------------------------------------------//
 
-	private static void runHadoopSquiggleCmd(String in, String out, int min, int max) throws Exception {
-		Configuration conf = new Configuration();
+	private static void runHadoopSquiggleCmd(String in, String out, String lib, int min, int max) throws Exception {
+		/*Configuration conf = new Configuration();
 		FileSystem fs = FileSystem.get(conf);
 
 		if (!fs.exists(new Path(in))) {
@@ -279,7 +202,7 @@ public class SquiggleCmd {
 				System.out.println("Done.");
 			}
 		}
-		fs.delete(new Path(outHdfsDirname), true);
+		fs.delete(new Path(outHdfsDirname), true);*/
 	}
 
 	//-----------------------------------------------------------------------//

@@ -12,6 +12,9 @@ public class ImportCommandLine {
 	  
 	  @Parameter(names = "--compress", description = "Compress the output HDFS Hadoop file")
 	  private boolean isCompression = false;
+	  
+	  @Parameter(names = "--lib", description = "Path where library is located")
+	  private String lib;
 
 	public String getIn() {
 		return in;
@@ -35,5 +38,11 @@ public class ImportCommandLine {
 
 	public void setIsCompression(boolean isCompression) {
 		this.isCompression = isCompression;
+	}
+	public String getlib(){
+		return lib;
+	}
+	public void setlib(String lib){
+		this.lib = lib;
 	}
 }
