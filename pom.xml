@@ -61,7 +61,8 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass></mainClass>
+							<addClasspath>true</addClasspath>
+							<mainClass>org.opencb.hpg_pore.Main</mainClass>
 						</manifest>
 					</archive>
 					<descriptorRefs>
