@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 function print_usage(){
-  echo "Usage: hpg-pore COMMAND"
+  echo "Usage: hpg-pore --- <hpg-pore jar> COMMAND"
   echo "       where COMMAND is one of:"
   echo ""
   echo "  stats     explore Fast5 reads by computing statistics and plotting charts"
@@ -29,7 +29,16 @@ if [ $# = 0 ]; then
 fi
 
 HADOOP=0
-COMMAND=$1
+
+JAR=$1
+if [ ! -e "$JAR" ]; then
+  echo "Error: Jar $JAR does not exist!"
+  echo
+  print_usage
+  exit
+fi
+
+COMMAND=$2
 case $COMMAND in
   # usage flags
   --help|-help|-h)
@@ -61,10 +70,10 @@ case $COMMAND in
 esac
 
 if [ $HADOOP -eq 1 ]; then
-	# echo "hadoop jar /tmp/libs/hpg-pore-0.1.0.jar $@"
-	hadoop jar /tmp/libs/hpg-pore-0.1.0.jar $@ 
+	# echo "hadoop jar $@"
+	hadoop jar $@ 
 else
-	# echo "java -jar /tmp/libs/hpg-pore-0.1.0.jar $@"
-	java -jar /tmp/libs/hpg-pore-0.1.0.jar $@
+	# echo "java -jar $@"
+	java -jar $@
 fi
 
