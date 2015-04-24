@@ -115,6 +115,8 @@ public class HadoopStatsCmd extends Configured implements Tool {
 		job.setCombinerClass(HadoopStatsCmd.Combine.class);
 		job.setReducerClass(HadoopStatsCmd.Reduce.class);
 		job.setNumReduceTasks(1);
+		
+		
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(StatsWritable.class);
 

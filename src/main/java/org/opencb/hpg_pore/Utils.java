@@ -29,6 +29,14 @@ import org.opencb.hpg_pore.hadoop.ParamsforDraw;
 import org.opencb.hpg_pore.hadoop.StatsWritable;
 import org.opencb.hpg_pore.hadoop.StatsWritable.BasicStats;
 
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
+
+
+import org.apache.hadoop.io.MapFile;
+import org.apache.hadoop.io.Text;
+
 public class Utils {
 
 	public static String toModeString(String mode) {
@@ -79,6 +87,45 @@ public class Utils {
 			System.out.println(ex);
 		}
 		return result;
+	}
+	/*****************************************
+	 * Read a file in a MapFile in Hadoop
+	 * 
+	 * @param nameFile
+	 * @return
+	 * @throws IOException
+	 */
+	public static byte[] readHadoop(String directory, String nameFile) throws IOException {
+		 
+		Configuration conf = new Configuration();
+		FileSystem fs = null;
+		
+		Text txtValue = new Text();
+		MapFile.Reader reader = null;
+		
+		Text txtKey = new Text(nameFile);
+		byte[] b = null;
+		try {
+			fs = FileSystem.get(conf);
+			try {
+				reader = new MapFile.Reader(fs, directory, conf);
+				reader.get(txtKey, txtValue);
+				b = txtValue.getBytes();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+ 
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+                if(reader != null)
+				reader.close();
+  		}
+		
+		/*System.out.println("The key is " + txtKey.toString()
+				+ " and the value is " + txtValue.toString());*/
+		
+		return b;
 	}
 
 	public static long date2seconds(String str_date) throws ParseException {
@@ -301,9 +348,9 @@ public class Utils {
 		final XYSeries series5 = new XYSeries("% N");
 	
 		float pnumA, pnumT, pnumC, pnumG, pnumN;
-		int i = 0;
+		
 		for(int key: map.keySet()) {
-			i++;
+			
 			ParamsforDraw p = map.get(key);
 			int total = p.numA + p.numC + p.numG + p.numT + p.numN;
 			pnumA = 100 * p.numA / total;

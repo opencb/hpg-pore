@@ -91,7 +91,8 @@ public class HadoopImportCmd {
 				}
 			}
 		}
-		IOUtils.closeStream(writer);
+		IOUtils.closeStream(writer);	
+	
 	}
 	
 	//-----------------------------------------------------------------------//

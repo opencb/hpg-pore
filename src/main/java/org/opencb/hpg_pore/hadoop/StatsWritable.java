@@ -549,7 +549,7 @@ public class StatsWritable implements Writable {
 				try {
 					startTime = Utils.date2seconds(v);
 				} catch (ParseException e) {
-					// TODO Auto-generated catch block
+					
 					e.printStackTrace();
 					startTime = -1;
 				}

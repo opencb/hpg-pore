@@ -4,8 +4,8 @@ import com.beust.jcommander.Parameter;
 
 public class SquiggleCommandLine {
 	 
-	  @Parameter(names = "--src", description = "Input folder (or file) where to find Fast5 files", required = true)
-	  private String src;
+	  @Parameter(names = "--in", description = "Input folder (or file) where to find Fast5 files", required = true)
+	  private String in;
 	 
 	  @Parameter(names = "--out", description = "Output folder where to save statistics results and charts", required = true)
 	  private String out;
@@ -19,15 +19,18 @@ public class SquiggleCommandLine {
 	  @Parameter(names = "--max", description = "Max time for draw the graphic")
 	  private int max;
 	  
+	  @Parameter(names = "--fast5_name", description = "The old name of the fast5  the user want to use ")
+	  private String fast5_name;
+	  
 	  @Parameter(names = "--lib", description = "Path where library is located")
 	  private String lib;
 
-	public String getSrc() {
-		return src;
+	public String getin() {
+		return in;
 	}
 
-	public void setIn(String src) {
-		this.src = src;
+	public void setIn(String in) {
+		this.in = in;
 	}
 
 	public String getOut() {
@@ -62,5 +65,11 @@ public class SquiggleCommandLine {
 	}
 	public void setlib(String lib){
 		this.lib = lib;
+	}
+	public String getfast5_name(){
+		return fast5_name;
+	}
+	public void setfast5_name(String fast5_name){
+		this.fast5_name = fast5_name;
 	}
 }

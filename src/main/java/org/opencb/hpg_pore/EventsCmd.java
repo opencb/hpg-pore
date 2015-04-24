@@ -6,14 +6,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Date;
-import java.util.HashMap;
+
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.util.ToolRunner;
-import org.jfree.chart.JFreeChart;
 import org.opencb.hpg_pore.commandline.EventsCommandLine;
 import org.opencb.hpg_pore.hadoop.HadoopFastqCmd;
 
@@ -40,9 +39,9 @@ public class EventsCmd {
 		}
 
 		if (cmdLine.isHadoop()) {
-			runHadoopEventsCmd(cmdLine.getSrc(), cmdLine.getOut(), cmdLine.getlib(),cmdLine.getmin(), cmdLine.getmax());
+			runHadoopEventsCmd(cmdLine.getin(), cmdLine.getOut(), cmdLine.getlib(),cmdLine.getmin(), cmdLine.getmax());
 		} else {
-			runLocalEventsCmd(cmdLine.getSrc(), cmdLine.getOut(), cmdLine.getlib(),cmdLine.getmin(), cmdLine.getmax());
+			runLocalEventsCmd(cmdLine.getin(), cmdLine.getOut(), cmdLine.getlib(),cmdLine.getmin(), cmdLine.getmax());
 		}		
 	}
 

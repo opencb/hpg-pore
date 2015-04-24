@@ -4,7 +4,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
-import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -15,7 +14,7 @@ import org.apache.hadoop.util.ToolRunner;
 import org.opencb.hpg_pore.commandline.StatsCommandLine;
 import org.opencb.hpg_pore.hadoop.HadoopStatsCmd;
 import org.opencb.hpg_pore.hadoop.StatsWritable;
-import org.opencb.hpg_pore.hadoop.StatsWritable.BasicStats;
+
 
 import com.beust.jcommander.JCommander;
 

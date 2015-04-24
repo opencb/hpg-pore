@@ -36,6 +36,8 @@ public class Main {
 			SquiggleCmd.run(newArgs);
 		} else if (cmd.equalsIgnoreCase("events")) {
 			EventsCmd.run(newArgs);
+		} else if (cmd.equalsIgnoreCase("fast5_names")) {
+			Fast5_namesCmd.run(newArgs);
 		} else {
 			System.out.println("Error: Unknown command");
 			help();
