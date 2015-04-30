@@ -81,7 +81,7 @@ public class HadoopImportCmd {
 			fast5 = new File(name);
 			content = Utils.read(fast5);
 			if (content != null) {
-				key = new Text(fast5.getName());
+				key = new Text(fast5.getName().trim());
 				value = new BytesWritable(content);
 				System.out.println("key = " + key);
 				try {
