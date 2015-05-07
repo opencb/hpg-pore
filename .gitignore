@@ -8,3 +8,4 @@
 /third-party/
 *.Plo
 *.Po
+.idea*
