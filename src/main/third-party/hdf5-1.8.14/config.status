@@ -437,11 +437,11 @@ Copyright (C) 2012 Free Software Foundation, Inc.
 This config.status script is free software; the Free Software Foundation
 gives unlimited permission to copy, distribute and modify it."
 
-ac_pwd='/home/sgallego/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14'
+ac_pwd='/home/jtarraga/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14'
 srcdir='.'
 INSTALL='/usr/bin/install -c'
 MKDIR_P='/bin/mkdir -p'
-AWK='mawk'
+AWK='gawk'
 test -n "$AWK" || AWK=awk
 # The default lists apply if the user does not specify any file.
 ac_need_defaults=:
@@ -675,8 +675,8 @@ postuninstall_cmds=''
 finish_cmds='PATH="\$PATH:/sbin" ldconfig -n $libdir'
 finish_eval=''
 hardcode_into_libs='yes'
-sys_lib_search_path_spec='/usr/lib/gcc/x86_64-linux-gnu/4.8 /usr/lib/x86_64-linux-gnu /usr/lib /lib/x86_64-linux-gnu /lib '
-sys_lib_dlsearch_path_spec='/lib /usr/lib /usr/lib/x86_64-linux-gnu/libfakeroot /usr/local/lib /lib/x86_64-linux-gnu /usr/lib/x86_64-linux-gnu /usr/lib/x86_64-linux-gnu/mesa-egl /usr/lib/nvidia-331 /usr/lib32/nvidia-331 /lib32 /usr/lib32 '
+sys_lib_search_path_spec='/usr/lib/gcc/x86_64-linux-gnu/4.4.7 /usr/lib/x86_64-linux-gnu /usr/lib /lib/x86_64-linux-gnu /lib /opt/intel/intel-opencl-1.2-5.0.0.43/opencl/lib64 '
+sys_lib_dlsearch_path_spec='/lib /usr/lib /usr/local/cuda/lib64 /usr/local/cuda/lib /usr/lib/x86_64-linux-gnu/libfakeroot /lib/i386-linux-gnu /usr/lib/i386-linux-gnu /lib/i686-linux-gnu /usr/lib/i686-linux-gnu /usr/lib/i386-linux-gnu/mesa /lib/i386-linux-gnu /usr/lib/i386-linux-gnu /lib/i686-linux-gnu /usr/lib/i686-linux-gnu /opt/intel/lib/intel64/ /usr/local/lib /lib/x86_64-linux-gnu /usr/lib/x86_64-linux-gnu /usr/lib/x86_64-linux-gnu/mesa-egl /usr/lib/x86_64-linux-gnu/mesa /lib32 /usr/lib32 /libx32 /usr/libx32 '
 hardcode_action='immediate'
 enable_dlopen='yes'
 enable_dlopen_self='yes'
@@ -1020,17 +1020,17 @@ S["BUILD_ALL_CONDITIONAL_FALSE"]=""
 S["BUILD_ALL_CONDITIONAL_TRUE"]="#"
 S["HL_FOR"]=""
 S["HL"]="hl"
-S["DYNAMIC_DIRS"]="-R/home/sgallego/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/hdf5/lib -R/home/sgallego/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/hdf5/"\
+S["DYNAMIC_DIRS"]="-R/home/jtarraga/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/hdf5/lib -R/home/jtarraga/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/hdf5/"\
 "lib "
-S["ROOT"]="/home/sgallego/appl-clinic11/hadoop-pore/src/main/third-party/hdf5-1.8.14"
+S["ROOT"]="/home/jtarraga/appl-local/hadoop-pore/src/main/third-party/hdf5-1.8.14"
 S["CXX_VERSION"]="no"
 S["FC_VERSION"]="no"
-S["CC_VERSION"]="/usr/bin/gcc"
+S["CC_VERSION"]="/usr/local/cuda/bin/gcc"
 S["WORDS_BIGENDIAN"]="no"
 S["BYTESEX"]="little-endian"
 S["CONFIG_MODE"]="production"
-S["CONFIG_USER"]="sgallego@practicas04"
-S["CONFIG_DATE"]="Thu Jan 15 11:58:49 CET 2015"
+S["CONFIG_USER"]="jtarraga@cgonzalez"
+S["CONFIG_DATE"]="Thu May  7 14:53:18 CEST 2015"
 S["H5_VERSION"]="1.8.14"
 S["DIRECT_VFD_CONDITIONAL_FALSE"]=""
 S["DIRECT_VFD_CONDITIONAL_TRUE"]="#"
@@ -1142,7 +1142,7 @@ S["ac_ct_CC"]="gcc"
 S["LDFLAGS"]=""
 S["CFLAGS"]=""
 S["CC"]="gcc"
-S["UNAME_INFO"]="Linux practicas04 3.13.0-43-generic #72-Ubuntu SMP Mon Dec 8 19:35:06 UTC 2014 x86_64 x86_64 x86_64 GNU/Linux"
+S["UNAME_INFO"]="Linux cgonzalez 3.13.0-49-generic #83-Ubuntu SMP Fri Apr 10 20:11:33 UTC 2015 x86_64 x86_64 x86_64 GNU/Linux"
 S["enable_static"]="yes"
 S["enable_shared"]="yes"
 S["STATIC_SHARED"]="static, shared"
@@ -1162,7 +1162,7 @@ S["HDF_FORTRAN"]="no"
 S["STATIC_EXEC"]="no"
 S["MPE"]="no"
 S["EXTERNAL_FILTERS"]="deflate(zlib)"
-S["AM_LDFLAGS"]=" -L/home/sgallego/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/hdf5/lib"
+S["AM_LDFLAGS"]=" -L/home/jtarraga/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/hdf5/lib"
 S["AM_CPPFLAGS"]="-D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_BSD_SOURCE "
 S["AM_CXXFLAGS"]=""
 S["AM_FCFLAGS"]=""
@@ -1172,12 +1172,11 @@ S["H5_CXXFLAGS"]=" "
 S["H5_FCFLAGS"]=" "
 S["H5_CPPFLAGS"]="-D_POSIX_C_SOURCE=199506L   -DNDEBUG -UH5_DEBUG_API"
 S["H5_CFLAGS"]="-std=c99 -pedantic -Wall -Wextra -Wundef -Wshadow -Wpointer-arith -Wbad-function-cast -Wcast-qual -Wcast-align -Wwrite-strings -Wconversion -Waggreg"\
-"ate-return -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wredundant-decls -Wnested-externs -Winline -Wfloat-equal -Wmissing-forma"\
-"t-attribute -Wmissing-noreturn -Wpacked -Wdisabled-optimization -Wformat=2 -Wunreachable-code -Wendif-labels -Wdeclaration-after-statement -Wold-sty"\
-"le-definition -Winvalid-pch -Wvariadic-macros -Winit-self -Wmissing-include-dirs -Wswitch-default -Wswitch-enum -Wunused-macros -Wunsafe-loop-optimi"\
-"zations -Wc++-compat -Wstrict-overflow -Wlogical-op -Wlarger-than=2048 -Wvla -Wsync-nand -Wframe-larger-than=16384 -Wpacked-bitfield-compat -Wstrict"\
-"-overflow=5 -Wjump-misses-init -Wunsuffixed-float-constants -Wdouble-promotion -Wsuggest-attribute=const -Wtrampolines -Wstack-usage=8192 -Wvector-o"\
-"peration-performance -Wsuggest-attribute=pure -Wsuggest-attribute=noreturn -Wsuggest-attribute=format -O3 -fomit-frame-pointer -finline-functions"
+"ate-return -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wredundant-decls -Wnested-externs -Winline -Wno-long-long -Wfloat-equal "\
+"-Wmissing-format-attribute -Wmissing-noreturn -Wpacked -Wdisabled-optimization -Wformat=2 -Wunreachable-code -Wendif-labels -Wdeclaration-after-stat"\
+"ement -Wold-style-definition -Winvalid-pch -Wvariadic-macros -Wnonnull -Winit-self -Wmissing-include-dirs -Wswitch-default -Wswitch-enum -Wunused-ma"\
+"cros -Wunsafe-loop-optimizations -Wc++-compat -Wstrict-overflow -Wlogical-op -Wlarger-than=2048 -Wvla -Wsync-nand -Wframe-larger-than=16384 -Wpacked"\
+"-bitfield-compat -O3 -fomit-frame-pointer -finline-functions"
 S["CPPFLAGS"]=""
 S["host_os"]="linux-gnu"
 S["host_vendor"]="unknown"
@@ -1199,17 +1198,17 @@ S["am__tar"]="$${TAR-tar} chof - \"$$tardir\""
 S["AMTAR"]="$${TAR-tar}"
 S["am__leading_dot"]="."
 S["SET_MAKE"]=""
-S["AWK"]="mawk"
+S["AWK"]="gawk"
 S["mkdir_p"]="$(MKDIR_P)"
 S["MKDIR_P"]="/bin/mkdir -p"
 S["INSTALL_STRIP_PROGRAM"]="$(install_sh) -c -s"
 S["STRIP"]="strip"
-S["install_sh"]="${SHELL} /home/sgallego/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/bin/install-sh"
-S["MAKEINFO"]="${SHELL} /home/sgallego/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/bin/missing makeinfo"
-S["AUTOHEADER"]="${SHELL} /home/sgallego/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/bin/missing autoheader"
-S["AUTOMAKE"]="${SHELL} /home/sgallego/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/bin/missing automake-1.14"
-S["AUTOCONF"]="${SHELL} /home/sgallego/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/bin/missing autoconf"
-S["ACLOCAL"]="${SHELL} /home/sgallego/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/bin/missing aclocal-1.14"
+S["install_sh"]="${SHELL} /home/jtarraga/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/bin/install-sh"
+S["MAKEINFO"]="${SHELL} /home/jtarraga/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/bin/missing makeinfo"
+S["AUTOHEADER"]="${SHELL} /home/jtarraga/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/bin/missing autoheader"
+S["AUTOMAKE"]="${SHELL} /home/jtarraga/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/bin/missing automake-1.14"
+S["AUTOCONF"]="${SHELL} /home/jtarraga/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/bin/missing autoconf"
+S["ACLOCAL"]="${SHELL} /home/jtarraga/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/bin/missing aclocal-1.14"
 S["VERSION"]="1.8.14"
 S["PACKAGE"]="hdf5"
 S["CYGPATH_W"]="echo"
@@ -1245,7 +1244,7 @@ S["libexecdir"]="${exec_prefix}/libexec"
 S["sbindir"]="${exec_prefix}/sbin"
 S["bindir"]="${exec_prefix}/bin"
 S["program_transform_name"]="s,x,x,"
-S["prefix"]="/home/sgallego/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/hdf5"
+S["prefix"]="/home/jtarraga/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/hdf5"
 S["exec_prefix"]="${prefix}"
 S["PACKAGE_URL"]=""
 S["PACKAGE_BUGREPORT"]="help@hdfgroup.org"

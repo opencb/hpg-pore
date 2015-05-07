@@ -32,7 +32,7 @@ EXIT_FAILURE=1
 
 # Where the tool is installed.
 # Note: no '/' after DESTDIR.  Explanation in commence.am
-prefix="${prefix:-${DESTDIR}/home/sgallego/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/hdf5}"
+prefix="${prefix:-${DESTDIR}/home/jtarraga/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/hdf5}"
 PARALLEL=no		# Am I in parallel mode?
 AR="ar"
 RANLIB="ranlib"

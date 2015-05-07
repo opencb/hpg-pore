@@ -24,7 +24,7 @@
 ## then modify them accordingly to represent the new paths.               ##
 ##                                                                        ##
 ############################################################################
-prefix="/home/sgallego/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/hdf5"
+prefix="/home/jtarraga/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/hdf5"
 exec_prefix="${prefix}"
 libdir="${exec_prefix}/lib"
 includedir="${prefix}/include"
@@ -91,7 +91,7 @@ CXXLINKERBASE="no"
 # to the user's flags.
 H5BLD_CXXFLAGS=" "
 H5BLD_CPPFLAGS="-D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_BSD_SOURCE  "
-H5BLD_LDFLAGS=" -L/home/sgallego/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/hdf5/lib "
+H5BLD_LDFLAGS=" -L/home/jtarraga/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/hdf5/lib "
 H5BLD_LIBS=" -lz -ldl -lm "
 
 CXX="${HDF5_CXX:-$CXXBASE}"

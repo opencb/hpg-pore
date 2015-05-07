@@ -334,7 +334,7 @@ am__set_b = \
       b='$*';; \
   esac
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-ACLOCAL = ${SHELL} /home/sgallego/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/bin/missing aclocal-1.14
+ACLOCAL = ${SHELL} /home/jtarraga/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/bin/missing aclocal-1.14
 ADD_PARALLEL_FILES = no
 AMTAR = $${TAR-tar}
 
@@ -343,29 +343,29 @@ AMTAR = $${TAR-tar}
 # AM_CFLAGS is an automake construct which should be used by Makefiles 
 # instead of CFLAGS, as CFLAGS is reserved solely for the user to define.
 # This applies to FCFLAGS, CXXFLAGS, CPPFLAGS, and LDFLAGS as well.
-AM_CFLAGS =  -std=c99 -pedantic -Wall -Wextra -Wundef -Wshadow -Wpointer-arith -Wbad-function-cast -Wcast-qual -Wcast-align -Wwrite-strings -Wconversion -Waggregate-return -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wredundant-decls -Wnested-externs -Winline -Wfloat-equal -Wmissing-format-attribute -Wmissing-noreturn -Wpacked -Wdisabled-optimization -Wformat=2 -Wunreachable-code -Wendif-labels -Wdeclaration-after-statement -Wold-style-definition -Winvalid-pch -Wvariadic-macros -Winit-self -Wmissing-include-dirs -Wswitch-default -Wswitch-enum -Wunused-macros -Wunsafe-loop-optimizations -Wc++-compat -Wstrict-overflow -Wlogical-op -Wlarger-than=2048 -Wvla -Wsync-nand -Wframe-larger-than=16384 -Wpacked-bitfield-compat -Wstrict-overflow=5 -Wjump-misses-init -Wunsuffixed-float-constants -Wdouble-promotion -Wsuggest-attribute=const -Wtrampolines -Wstack-usage=8192 -Wvector-operation-performance -Wsuggest-attribute=pure -Wsuggest-attribute=noreturn -Wsuggest-attribute=format -O3 -fomit-frame-pointer -finline-functions
+AM_CFLAGS =  -std=c99 -pedantic -Wall -Wextra -Wundef -Wshadow -Wpointer-arith -Wbad-function-cast -Wcast-qual -Wcast-align -Wwrite-strings -Wconversion -Waggregate-return -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wredundant-decls -Wnested-externs -Winline -Wno-long-long -Wfloat-equal -Wmissing-format-attribute -Wmissing-noreturn -Wpacked -Wdisabled-optimization -Wformat=2 -Wunreachable-code -Wendif-labels -Wdeclaration-after-statement -Wold-style-definition -Winvalid-pch -Wvariadic-macros -Wnonnull -Winit-self -Wmissing-include-dirs -Wswitch-default -Wswitch-enum -Wunused-macros -Wunsafe-loop-optimizations -Wc++-compat -Wstrict-overflow -Wlogical-op -Wlarger-than=2048 -Wvla -Wsync-nand -Wframe-larger-than=16384 -Wpacked-bitfield-compat -O3 -fomit-frame-pointer -finline-functions
 AM_CPPFLAGS = -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_BSD_SOURCE  -D_POSIX_C_SOURCE=199506L   -DNDEBUG -UH5_DEBUG_API
 AM_CXXFLAGS =   
 AM_DEFAULT_VERBOSITY = 0
 AM_FCFLAGS =   
-AM_LDFLAGS =  -L/home/sgallego/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/hdf5/lib 
+AM_LDFLAGS =  -L/home/jtarraga/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/hdf5/lib 
 AM_MAKEFLAGS = 
 AR = ar
 AS = as
-AUTOCONF = ${SHELL} /home/sgallego/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/bin/missing autoconf
-AUTOHEADER = ${SHELL} /home/sgallego/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/bin/missing autoheader
-AUTOMAKE = ${SHELL} /home/sgallego/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/bin/missing automake-1.14
-AWK = mawk
+AUTOCONF = ${SHELL} /home/jtarraga/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/bin/missing autoconf
+AUTOHEADER = ${SHELL} /home/jtarraga/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/bin/missing autoheader
+AUTOMAKE = ${SHELL} /home/jtarraga/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/bin/missing automake-1.14
+AWK = gawk
 BYTESEX = little-endian
 CC = gcc
 CCDEPMODE = depmode=gcc3
-CC_VERSION = /usr/bin/gcc
+CC_VERSION = /usr/local/cuda/bin/gcc
 CFLAGS = 
 CLEARFILEBUF = yes
 CODESTACK = no
-CONFIG_DATE = Thu Jan 15 11:58:49 CET 2015
+CONFIG_DATE = Thu May  7 14:53:18 CEST 2015
 CONFIG_MODE = production
-CONFIG_USER = sgallego@practicas04
+CONFIG_USER = jtarraga@cgonzalez
 CPP = gcc -E
 CPPFLAGS = 
 CXX = no
@@ -383,7 +383,7 @@ DIRECT_VFD = no
 DLLTOOL = dlltool
 DSYMUTIL = 
 DUMPBIN = 
-DYNAMIC_DIRS = -R/home/sgallego/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/hdf5/lib -R/home/sgallego/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/hdf5/lib 
+DYNAMIC_DIRS = -R/home/jtarraga/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/hdf5/lib -R/home/jtarraga/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/hdf5/lib 
 ECHO_C = 
 ECHO_N = -n
 ECHO_T = 
@@ -405,7 +405,7 @@ FGREP = /bin/grep -F
 FILTERS = shuffle,fletcher32,nbit,scaleoffset
 FSEARCH_DIRS = 
 GREP = /bin/grep
-H5_CFLAGS = -std=c99 -pedantic -Wall -Wextra -Wundef -Wshadow -Wpointer-arith -Wbad-function-cast -Wcast-qual -Wcast-align -Wwrite-strings -Wconversion -Waggregate-return -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wredundant-decls -Wnested-externs -Winline -Wfloat-equal -Wmissing-format-attribute -Wmissing-noreturn -Wpacked -Wdisabled-optimization -Wformat=2 -Wunreachable-code -Wendif-labels -Wdeclaration-after-statement -Wold-style-definition -Winvalid-pch -Wvariadic-macros -Winit-self -Wmissing-include-dirs -Wswitch-default -Wswitch-enum -Wunused-macros -Wunsafe-loop-optimizations -Wc++-compat -Wstrict-overflow -Wlogical-op -Wlarger-than=2048 -Wvla -Wsync-nand -Wframe-larger-than=16384 -Wpacked-bitfield-compat -Wstrict-overflow=5 -Wjump-misses-init -Wunsuffixed-float-constants -Wdouble-promotion -Wsuggest-attribute=const -Wtrampolines -Wstack-usage=8192 -Wvector-operation-performance -Wsuggest-attribute=pure -Wsuggest-attribute=noreturn -Wsuggest-attribute=format -O3 -fomit-frame-pointer -finline-functions
+H5_CFLAGS = -std=c99 -pedantic -Wall -Wextra -Wundef -Wshadow -Wpointer-arith -Wbad-function-cast -Wcast-qual -Wcast-align -Wwrite-strings -Wconversion -Waggregate-return -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wredundant-decls -Wnested-externs -Winline -Wno-long-long -Wfloat-equal -Wmissing-format-attribute -Wmissing-noreturn -Wpacked -Wdisabled-optimization -Wformat=2 -Wunreachable-code -Wendif-labels -Wdeclaration-after-statement -Wold-style-definition -Winvalid-pch -Wvariadic-macros -Wnonnull -Winit-self -Wmissing-include-dirs -Wswitch-default -Wswitch-enum -Wunused-macros -Wunsafe-loop-optimizations -Wc++-compat -Wstrict-overflow -Wlogical-op -Wlarger-than=2048 -Wvla -Wsync-nand -Wframe-larger-than=16384 -Wpacked-bitfield-compat -O3 -fomit-frame-pointer -finline-functions
 H5_CPPFLAGS = -D_POSIX_C_SOURCE=199506L   -DNDEBUG -UH5_DEBUG_API
 H5_CXXFLAGS =  
 H5_CXX_SHARED = no
@@ -447,7 +447,7 @@ LN_S = ln -s
 LTLIBOBJS = 
 LT_STATIC_EXEC = 
 MAINT = #
-MAKEINFO = ${SHELL} /home/sgallego/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/bin/missing makeinfo
+MAKEINFO = ${SHELL} /home/jtarraga/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/bin/missing makeinfo
 MANIFEST_TOOL = :
 MKDIR_P = /bin/mkdir -p
 MPE = no
@@ -469,7 +469,7 @@ PARALLEL = no
 PATH_SEPARATOR = :
 PERL = perl
 RANLIB = ranlib
-ROOT = /home/sgallego/appl-clinic11/hadoop-pore/src/main/third-party/hdf5-1.8.14
+ROOT = /home/jtarraga/appl-local/hadoop-pore/src/main/third-party/hdf5-1.8.14
 RUNPARALLEL = 
 RUNSERIAL = 
 R_INTEGER = 
@@ -489,7 +489,7 @@ THREADSAFE = no
 TIME = time
 TR = /usr/bin/tr
 TRACE_API = no
-UNAME_INFO = Linux practicas04 3.13.0-43-generic #72-Ubuntu SMP Mon Dec 8 19:35:06 UTC 2014 x86_64 x86_64 x86_64 GNU/Linux
+UNAME_INFO = Linux cgonzalez 3.13.0-49-generic #83-Ubuntu SMP Fri Apr 10 20:11:33 UTC 2015 x86_64 x86_64 x86_64 GNU/Linux
 USE_FILTER_DEFLATE = yes
 USE_FILTER_FLETCHER32 = yes
 USE_FILTER_NBIT = yes
@@ -499,10 +499,10 @@ USE_FILTER_SZIP = no
 USINGMEMCHECKER = no
 VERSION = 1.8.14
 WORDS_BIGENDIAN = no
-abs_builddir = /home/sgallego/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/hl/c++/examples
-abs_srcdir = /home/sgallego/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/hl/c++/examples
-abs_top_builddir = /home/sgallego/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14
-abs_top_srcdir = /home/sgallego/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14
+abs_builddir = /home/jtarraga/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/hl/c++/examples
+abs_srcdir = /home/jtarraga/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/hl/c++/examples
+abs_top_builddir = /home/jtarraga/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14
+abs_top_srcdir = /home/jtarraga/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14
 ac_ct_AR = 
 ac_ct_CC = gcc
 ac_ct_CXX = 
@@ -537,7 +537,7 @@ host_vendor = unknown
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /home/sgallego/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/bin/install-sh
+install_sh = ${SHELL} /home/jtarraga/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/bin/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
@@ -546,7 +546,7 @@ mandir = ${datarootdir}/man
 mkdir_p = $(MKDIR_P)
 oldincludedir = /usr/include
 pdfdir = ${docdir}
-prefix = /home/sgallego/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/hdf5
+prefix = /home/jtarraga/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/hdf5
 program_transform_name = s,x,x,
 psdir = ${docdir}
 sbindir = ${exec_prefix}/sbin

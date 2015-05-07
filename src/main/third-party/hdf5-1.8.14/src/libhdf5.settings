@@ -4,21 +4,21 @@
 General Information:
 -------------------
 		   HDF5 Version: 1.8.14
-		  Configured on: Thu Jan 15 11:58:49 CET 2015
-		  Configured by: sgallego@practicas04
+		  Configured on: Thu May  7 14:53:18 CEST 2015
+		  Configured by: jtarraga@cgonzalez
 		 Configure mode: production
 		    Host system: x86_64-unknown-linux-gnu
-	      Uname information: Linux practicas04 3.13.0-43-generic #72-Ubuntu SMP Mon Dec 8 19:35:06 UTC 2014 x86_64 x86_64 x86_64 GNU/Linux
+	      Uname information: Linux cgonzalez 3.13.0-49-generic #83-Ubuntu SMP Fri Apr 10 20:11:33 UTC 2015 x86_64 x86_64 x86_64 GNU/Linux
 		       Byte sex: little-endian
 		      Libraries: static, shared
-	     Installation point: /home/sgallego/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/hdf5
+	     Installation point: /home/jtarraga/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/hdf5
 
 Compiling Options:
 ------------------
                Compilation Mode: production
-                     C Compiler: /usr/bin/gcc
+                     C Compiler: /usr/local/cuda/bin/gcc
                          CFLAGS: 
-                      H5_CFLAGS: -std=c99 -pedantic -Wall -Wextra -Wundef -Wshadow -Wpointer-arith -Wbad-function-cast -Wcast-qual -Wcast-align -Wwrite-strings -Wconversion -Waggregate-return -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wredundant-decls -Wnested-externs -Winline -Wfloat-equal -Wmissing-format-attribute -Wmissing-noreturn -Wpacked -Wdisabled-optimization -Wformat=2 -Wunreachable-code -Wendif-labels -Wdeclaration-after-statement -Wold-style-definition -Winvalid-pch -Wvariadic-macros -Winit-self -Wmissing-include-dirs -Wswitch-default -Wswitch-enum -Wunused-macros -Wunsafe-loop-optimizations -Wc++-compat -Wstrict-overflow -Wlogical-op -Wlarger-than=2048 -Wvla -Wsync-nand -Wframe-larger-than=16384 -Wpacked-bitfield-compat -Wstrict-overflow=5 -Wjump-misses-init -Wunsuffixed-float-constants -Wdouble-promotion -Wsuggest-attribute=const -Wtrampolines -Wstack-usage=8192 -Wvector-operation-performance -Wsuggest-attribute=pure -Wsuggest-attribute=noreturn -Wsuggest-attribute=format -O3 -fomit-frame-pointer -finline-functions
+                      H5_CFLAGS: -std=c99 -pedantic -Wall -Wextra -Wundef -Wshadow -Wpointer-arith -Wbad-function-cast -Wcast-qual -Wcast-align -Wwrite-strings -Wconversion -Waggregate-return -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wredundant-decls -Wnested-externs -Winline -Wno-long-long -Wfloat-equal -Wmissing-format-attribute -Wmissing-noreturn -Wpacked -Wdisabled-optimization -Wformat=2 -Wunreachable-code -Wendif-labels -Wdeclaration-after-statement -Wold-style-definition -Winvalid-pch -Wvariadic-macros -Wnonnull -Winit-self -Wmissing-include-dirs -Wswitch-default -Wswitch-enum -Wunused-macros -Wunsafe-loop-optimizations -Wc++-compat -Wstrict-overflow -Wlogical-op -Wlarger-than=2048 -Wvla -Wsync-nand -Wframe-larger-than=16384 -Wpacked-bitfield-compat -O3 -fomit-frame-pointer -finline-functions
                       AM_CFLAGS: 
                        CPPFLAGS: 
                     H5_CPPFLAGS: -D_POSIX_C_SOURCE=199506L   -DNDEBUG -UH5_DEBUG_API
@@ -28,7 +28,7 @@ Compiling Options:
   Statically Linked Executables: no
                         LDFLAGS: 
                      H5_LDFLAGS: 
-                     AM_LDFLAGS:  -L/home/sgallego/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/hdf5/lib
+                     AM_LDFLAGS:  -L/home/jtarraga/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/hdf5/lib
  	 	Extra libraries:  -lz -ldl -lm 
  		       Archiver: ar
  		 	 Ranlib: ranlib
