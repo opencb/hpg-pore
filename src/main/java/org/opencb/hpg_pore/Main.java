@@ -20,7 +20,6 @@ public class Main {
 			newArgs[i-1] = new String(args[i]);
 		}	
 
-
 		if (cmd.equalsIgnoreCase("import")) {
 			HadoopImportCmd.run(newArgs);
 		} else if (cmd.equalsIgnoreCase("stats")){
@@ -33,6 +32,14 @@ public class Main {
 			help();
 		} else	if (cmd.equalsIgnoreCase("version")){
 			version();
+		} else if (cmd.equalsIgnoreCase("squiggle")) {
+			SquiggleCmd.run(newArgs);
+		} else if (cmd.equalsIgnoreCase("events")) {
+			EventsCmd.run(newArgs);
+		} else if (cmd.equalsIgnoreCase("fast5names")) {
+			Fast5NamesCmd.run(newArgs);
+		} else if (cmd.equalsIgnoreCase("export")) {
+			ExportCmd.run(newArgs);
 		} else {
 			System.out.println("Error: Unknown command");
 			help();
@@ -44,10 +51,12 @@ public class Main {
 		System.out.println("Usage: " + BINARY_NAME + " COMMAND");
 		System.out.println("	   where COMMAND is one of:");
 		System.out.println();
-		System.out.println("\tstats     explore Fast5 reads by computing statistics and plotting charts");
-		System.out.println("\tsquiggle  plot the measured signal for a given Fast5 read");
-		System.out.println("\tfastq     extract the sequences in Fastq format for a set of Fast5 reads");
-		System.out.println("\tfasta     extract the sequences in Fasta format for a set of Fast5 reads");
+		System.out.println("\tstats        explore Fast5 reads by computing statistics and plotting charts");
+		System.out.println("\tsquiggle     plot the measured signal for a given Fast5 read");
+		System.out.println("\tevents       extract the events");
+		System.out.println("\tfastq        extract the sequences in Fastq format for a set of Fast5 reads");
+		System.out.println("\tfasta        extract the sequences in Fasta format for a set of Fast5 reads");
+		System.out.println("\tfastqnames   extract the names of files in HFS directory");
 		System.out.println();
 		System.out.println("Previous commands can run both on a local system and on a Hadoop environment (for the latter, use the option --hadoop.");
 		System.out.println("Before executing those commands on a Hadoop environment, you must copy your Fast5 files to the Hadoop file system by running the command:");
@@ -56,6 +65,7 @@ public class Main {
 		System.out.println();
 		System.out.println("Other commands:");
 		System.out.println();
+		System.out.println("\texport   	copy the files in HDFS to local directory");
 		System.out.println("\tversion   print the version");
 		System.out.println("\thelp      print this help");
 		System.out.println();

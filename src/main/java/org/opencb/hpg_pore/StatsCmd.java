@@ -8,13 +8,13 @@ import java.util.Date;
 import java.util.HashMap;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.util.ToolRunner;
 import org.opencb.hpg_pore.commandline.StatsCommandLine;
 import org.opencb.hpg_pore.hadoop.HadoopStatsCmd;
 import org.opencb.hpg_pore.hadoop.StatsWritable;
+
 
 import com.beust.jcommander.JCommander;
 
@@ -33,14 +33,15 @@ public class StatsCmd {
 		try {
 			cmd.parse(args);
 		} catch (Exception e) {
+			
 			cmd.usage();
 			System.exit(-1);
 		}
 
 		if (cmdLine.isHadoop()) {
-			runHadoopStatsCmd(cmdLine.getIn(), cmdLine.getOut());
+			runHadoopStatsCmd(cmdLine.getIn(), cmdLine.getOut(), cmdLine.getlib());
 		} else {
-			runLocalStatsCmd(cmdLine.getIn(), cmdLine.getOut());
+			runLocalStatsCmd(cmdLine.getIn(), cmdLine.getOut(), cmdLine.getlib());
 		}		
 	}
 
@@ -49,14 +50,14 @@ public class StatsCmd {
 	//-----------------------------------------------------------------------//
 
 
-	private static void runLocalStatsCmd(String in, String out) {	
+	private static void runLocalStatsCmd(String in, String out, String lib) {	
 		File inFile = new File(in);
 		if (!inFile.exists()) {
 			System.out.println("Error: Local directory " + in + " does not exist!");
 			System.exit(-1);						
 		}
 
-		NativePoreSupport.loadLibrary();
+		NativePoreSupport.loadLibrary(lib);
 
 		// initialize PrintWriter map
 		HashMap<String, StatsWritable> statsMap = new HashMap<String, StatsWritable>();
@@ -70,42 +71,61 @@ public class StatsCmd {
 
 		// print results and charts
 		printResults(statsMap, out);
+		// Draw the grafics
+		drawResults(statsMap,out);
+		
 	}
 
 	//-----------------------------------------------------------------------//
 
 	private static void printResults(HashMap<String, StatsWritable> statsMap, String outDir) {
-		String rawFileName = outDir + "/raw.txt";
-
+		
+		String summaryFileName = outDir + "/summary.txt";
+		
 		try {
-			PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(rawFileName, false)));
+			PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(summaryFileName, false)));
 			for(String key: statsMap.keySet()) {
-				writer.print(key);
-				writer.print(statsMap.get(key).toFormat());
+				writer.print(Utils.createSummaryFile(statsMap.get(key), key));
 			}
 			writer.close();		
 
-			Utils.parseStatsFile(rawFileName, outDir);
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println("Error writing statitics results to the output folder :" + outDir);
 		}
+		
 	}
 
 	//-----------------------------------------------------------------------//
 
 	private static void processLocalFile(File inFile, HashMap<String, StatsWritable> statsMap) {
 
-		String info = new NativePoreSupport().getInfo(Utils.read(inFile));		
-
+		byte[] content = Utils.read(inFile);
+		String info = new NativePoreSupport().getInfo(content);		
+		if (info == null) {
+			System.out.println("Error reading file " + inFile.getAbsolutePath() + ". Maybe, the file is corrupt.");
+			return;
+		}
+		//System.out.println("getInfo:");
+		//System.out.println(info);
+		
 		StatsWritable stats = new StatsWritable();
-		String runId = stats.parseAndInit(info);
-
+		
+		String runId = Utils.getValue("run_id", info);
+		
+		String fastqs = new NativePoreSupport().getFastqs(content);
+		Utils.parseAndInitStats(info, fastqs, stats);
+		
+		
 		if (!statsMap.containsKey(runId)) {
 			statsMap.put(runId, stats);
 		} else {
 			statsMap.get(runId).update(stats);
+			//System.out.println(stats.toFormat());
 		}
+		//System.out.println(stats.toFormat());
+		
+		
 	}
 
 	//-----------------------------------------------------------------------//
@@ -120,11 +140,28 @@ public class StatsCmd {
 		}
 	}
 
+	
+	//-----------------------------------------------------------------------//
+	
+	private static void drawResults(HashMap<String, StatsWritable> statsMap, String outDir) {
+		try {
+			
+			for(String key: statsMap.keySet()) {
+				(statsMap.get(key)).draw(key, outDir);	
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("Error drawing statitics results to the output folder :" + outDir);
+		}
+		
+		
+	}
 	//-----------------------------------------------------------------------//
 	//  hadoop stats command                                                 //
 	//-----------------------------------------------------------------------//
 
-	private static void runHadoopStatsCmd(String in, String out) throws Exception {
+	private static void runHadoopStatsCmd(String in, String out, String lib) throws Exception {
 		Configuration conf = new Configuration();
 		FileSystem fs = FileSystem.get(conf);
 
@@ -136,9 +173,10 @@ public class StatsCmd {
 		String outHdfsDirname = new String(in + "-" + new Date().getTime());
 		System.out.println(in + ", " + out + ", " + outHdfsDirname);
 
-		String[] args = new String[2];
+		String[] args = new String[3];
 		args[0] = new String(in);
 		args[1] = new String(outHdfsDirname);
+		args[2] = new String(lib);
 
 		// map-reduce
 		int error = ToolRunner.run(new HadoopStatsCmd(), args);

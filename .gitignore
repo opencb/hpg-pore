@@ -4,4 +4,7 @@
 *.la
 *.so
 *~
-/target
+/target/
+/third-party/
+*.Plo
+*.Po

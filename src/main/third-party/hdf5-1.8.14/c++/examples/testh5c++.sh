@@ -28,7 +28,7 @@ EXIT_FAILURE=1
 
 # Where the tool is installed.
 # Note: no '/' after DESTDIR.  Explanation in commence.am
-prefix="${prefix:-${DESTDIR}/home/jtarraga/appl-new-opencb-clinic11/hdf5/hdf5-1.8.14/hdf5}"
+prefix="${prefix:-${DESTDIR}/home/sgallego/appl/hadoop-pore/src/main/third-party/hdf5-1.8.14/hdf5}"
 AR="ar"
 RANLIB="ranlib"
 H5TOOL="h5c++"           	# The tool name

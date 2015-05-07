@@ -13,6 +13,7 @@ Hadoop-pore README
 1. Build hdf5 libraries (libhdf5.a and libhdf5_hl.a)
 
   $ cd src/main/third-party/hdf5-1.8.14/
+  $ ./configure
   $ make
 
 2. Build the test

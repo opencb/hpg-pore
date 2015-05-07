@@ -9,11 +9,9 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.io.MapFile;
-import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.SequenceFile.CompressionType;
 import org.apache.hadoop.io.Text;
 import org.opencb.hpg_pore.Main;
@@ -83,7 +81,7 @@ public class HadoopImportCmd {
 			fast5 = new File(name);
 			content = Utils.read(fast5);
 			if (content != null) {
-				key = new Text(fast5.getName());
+				key = new Text(fast5.getName().trim());
 				value = new BytesWritable(content);
 				System.out.println("key = " + key);
 				try {
@@ -93,7 +91,8 @@ public class HadoopImportCmd {
 				}
 			}
 		}
-		IOUtils.closeStream(writer);
+		IOUtils.closeStream(writer);	
+	
 	}
 	
 	//-----------------------------------------------------------------------//
