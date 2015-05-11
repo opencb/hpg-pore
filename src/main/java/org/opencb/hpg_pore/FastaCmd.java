@@ -107,7 +107,14 @@ public class FastaCmd {
 		//System.out.println(fastqs);
 
 		String name, line, content;
-		String[] lines = fastqs.split("\n");
+		String[] lines;
+
+		try {
+			lines = fastqs.split("\n");
+		} catch (Exception e) {
+			System.out.println("Error reading FastA sequences from file " + inFile.getAbsolutePath() + ". Skip.");
+			return;
+		}
 
 		for (int i = 0; i < lines.length; i += 5) {
 			// first line: runId & template/complement/2d				
