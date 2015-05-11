@@ -5,7 +5,7 @@ function print_usage(){
   echo "       where COMMAND is one of:"
   echo ""
   echo "  stats        explore Fast5 reads by computing statistics and plotting charts"
-  echo "  squiggle     plot the measured signal for a given Fast5 read"
+  echo "  signal       plot the measured signal for a given Fast5 read"
   echo "  events       extract events in text file for a given Fast5 read"
   echo "  fastq        extract the sequences in Fastq format for a set of Fast5 reads"
   echo "  fasta        extract the sequences in Fasta format for a set of Fast5 reads"
@@ -57,7 +57,7 @@ case $COMMAND in
   	;;
   
   # command commands (hadoop or local commands)
-  stats|fastq|fasta|squiggle|events|fast5names|export|version)
+  stats|fastq|fasta|signal|events|fast5names|export|version)
   	for var in "$@"
 	do
     	if [ $var = "--hadoop" ]; then

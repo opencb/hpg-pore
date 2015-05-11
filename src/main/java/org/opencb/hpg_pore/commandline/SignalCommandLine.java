@@ -2,7 +2,7 @@ package org.opencb.hpg_pore.commandline;
 
 import com.beust.jcommander.Parameter;
 
-public class SquiggleCommandLine {
+public class SignalCommandLine {
 
 	@Parameter(names = "--in", description = "Input folder (or file) where to find Fast5 files", required = true)
 	private String in;

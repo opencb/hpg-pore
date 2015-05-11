@@ -29,7 +29,7 @@ public class EventsCmd {
 
 		EventsCommandLine cmdLine = new EventsCommandLine();
 		JCommander cmd = new JCommander(cmdLine);
-		cmd.setProgramName(Main.BINARY_NAME + " Events");
+		cmd.setProgramName(Main.BINARY_NAME + " events");
 
 		try {
 			cmd.parse(args);
@@ -67,7 +67,7 @@ public class EventsCmd {
 		events = new NativePoreSupport().getEvents(Utils.read(inFile), "template", min, max);
 		if(events != null){
 			//parsear la señal
-			String sFichero = outDir +"/template_Events.txt";
+			String sFichero = outDir +"/template_events.txt";
 		
 			PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(sFichero, false)));
 			String[] linea;
@@ -95,7 +95,7 @@ public class EventsCmd {
 		
 		if(events != null){
 			//parsear la señal
-			String sFichero = outDir +"/complement_Events.txt";
+			String sFichero = outDir +"/complement_events.txt";
 		
 			PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(sFichero, false)));
 			String[] linea;
@@ -124,7 +124,7 @@ public class EventsCmd {
 			//parsear la señal
 			
 			//parsear la señal
-			String sFichero = outDir +"/2D_Events.txt";
+			String sFichero = outDir +"/2D_events.txt";
 		
 			PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(sFichero, false)));
 			String[] linea;

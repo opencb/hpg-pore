@@ -9,12 +9,12 @@ import java.util.HashMap;
 
 
 import org.jfree.chart.JFreeChart;
-import org.opencb.hpg_pore.commandline.SquiggleCommandLine;
+import org.opencb.hpg_pore.commandline.SignalCommandLine;
 
 
 import com.beust.jcommander.JCommander;
 
-public class SquiggleCmd {
+public class SignalCmd {
 
 	public static String outDir;
 	//-----------------------------------------------------------------------//
@@ -23,9 +23,9 @@ public class SquiggleCmd {
 
 	public static void run(String[] args) throws Exception {	
 
-		SquiggleCommandLine cmdLine = new SquiggleCommandLine();
+		SignalCommandLine cmdLine = new SignalCommandLine();
 		JCommander cmd = new JCommander(cmdLine);
-		cmd.setProgramName(Main.BINARY_NAME + " squiggle");
+		cmd.setProgramName(Main.BINARY_NAME + " signal");
 
 		try {
 			cmd.parse(args);
@@ -35,10 +35,10 @@ public class SquiggleCmd {
 		}
 		
 		if (cmdLine.isHadoop()) {
-			runHadoopSquiggleCmd(cmdLine.getin(), cmdLine.getfast5_name(),cmdLine.getOut(), cmdLine.getmin() , cmdLine.getmax());
+			runHadoopSignalCmd(cmdLine.getin(), cmdLine.getfast5_name(), cmdLine.getOut(), cmdLine.getmin(), cmdLine.getmax());
 		} else {
 			
-			runLocalSquiggleCmd(cmdLine.getin(), cmdLine.getOut(), cmdLine.getmin(), cmdLine.getmax());
+			runLocalSignalCmd(cmdLine.getin(), cmdLine.getOut(), cmdLine.getmin(), cmdLine.getmax());
 		}		
 	}
 
@@ -47,7 +47,7 @@ public class SquiggleCmd {
 	//-----------------------------------------------------------------------//
 
 
-	private static void runLocalSquiggleCmd(String in, String out, int min, int max) throws IOException {
+	private static void runLocalSignalCmd(String in, String out, int min, int max) throws IOException {
 		File inFile = new File(in);
 		if (!inFile.exists()) {
 			System.out.println("Error: Local directory " + in + " does not exist!");
@@ -147,7 +147,7 @@ public class SquiggleCmd {
 	//  hadoop squiggle command                                              //
 	//-----------------------------------------------------------------------//
 
-	private static void runHadoopSquiggleCmd(String in, String nameFile,String out, int min, int max) throws Exception {
+	private static void runHadoopSignalCmd(String in, String nameFile, String out, int min, int max) throws Exception {
 				
 		NativePoreSupport.loadLibrary();
 		int width = 1024;
