@@ -24,7 +24,7 @@ public class Fast5NamesCmd {
 
 		Fast5NamesCommandLine cmdLine = new Fast5NamesCommandLine();
 		JCommander cmd = new JCommander(cmdLine);
-		cmd.setProgramName(Main.BINARY_NAME + "fast5_names");
+		cmd.setProgramName(Main.BINARY_NAME + "fast5names");
 
 		try {
 			cmd.parse(args);
@@ -34,11 +34,11 @@ public class Fast5NamesCmd {
 		}
 
 		
-		runHadoopGetNames(cmdLine.getin(), cmdLine.getOut(), cmdLine.getlib());
+		runHadoopGetNames(cmdLine.getin(), cmdLine.getOut());
 		
 	}
 
-	private static void runHadoopGetNames(String in, String out, String lib) throws IOException {	
+	private static void runHadoopGetNames(String in, String out) throws IOException {
 		Configuration conf = new Configuration();
 		FileSystem fs = FileSystem.get(conf);
 
@@ -47,14 +47,14 @@ public class Fast5NamesCmd {
 			System.exit(-1);			
 		}
 
-		NativePoreSupport.loadLibrary(lib);
+		NativePoreSupport.loadLibrary();
 
 		MapFile.Reader reader = null;
 		PrintWriter writer = null;
 				  
 		try {
 			
-			writer = new PrintWriter(out + "/FileNames.txt", "UTF-8");
+			writer = new PrintWriter(out + "/Fast5Filenames.txt", "UTF-8");
 			try {
 				reader = new MapFile.Reader(fs, in, conf);
 				Text key = (Text) reader.getKeyClass().newInstance();

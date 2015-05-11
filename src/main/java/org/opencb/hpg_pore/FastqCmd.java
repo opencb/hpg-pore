@@ -39,9 +39,9 @@ public class FastqCmd {
 		}
 
 		if (cmdLine.isHadoop()) {
-			runHadoopFastqCmd(cmdLine.getIn(), cmdLine.getOut(), cmdLine.getlib());
+			runHadoopFastqCmd(cmdLine.getIn(), cmdLine.getOut());
 		} else {
-			runLocalFastqCmd(cmdLine.getIn(), cmdLine.getOut(),cmdLine.getlib());
+			runLocalFastqCmd(cmdLine.getIn(), cmdLine.getOut());
 		}		
 	}
 
@@ -50,7 +50,7 @@ public class FastqCmd {
 	//-----------------------------------------------------------------------//
 
 	
-	private static void runLocalFastqCmd(String in, String out, String lib) {	
+	private static void runLocalFastqCmd(String in, String out) {
 		File inFile = new File(in);
 		if (!inFile.exists()) {
 			System.out.println("Error: Local directory " + in + " does not exist!");
@@ -59,7 +59,7 @@ public class FastqCmd {
 
 		outDir = out;
 		
-		NativePoreSupport.loadLibrary(lib);
+		NativePoreSupport.loadLibrary();
 		
 		// initialize PrintWriter map
 		HashMap<String, PrintWriter> printers = new HashMap<String, PrintWriter>();
@@ -160,7 +160,7 @@ public class FastqCmd {
 	//  hadoop fastq command                                                 //
 	//-----------------------------------------------------------------------//
 
-	private static void runHadoopFastqCmd(String in, String out, String lib) throws Exception {
+	private static void runHadoopFastqCmd(String in, String out) throws Exception {
 		Configuration conf = new Configuration();
 		FileSystem fs = FileSystem.get(conf);
 
@@ -175,7 +175,6 @@ public class FastqCmd {
 		String[] args = new String[3];
 		args[0] = new String(in);
 		args[1] = new String(outHdfsDirname);
-		args[2] = new String(lib);
 
 		// map-reduce
 		int error = ToolRunner.run(new HadoopFastqCmd(), args);

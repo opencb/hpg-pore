@@ -20,16 +20,9 @@ import org.opencb.hpg_pore.Utils;
 public class HadoopStatsCmd extends Configured implements Tool {
 		
 	public static class Map extends Mapper<Text, BytesWritable, Text, StatsWritable> {
-		private static String library;
 		@Override
 		public void setup(Context context) {
-			System.out.println("-----> loading libs..");	
-			Configuration conf = context.getConfiguration();
-			library = conf.get("lib",System.getenv("LD_LIBRARY_PATH"));
-			System.out.println("La libreria es:  "+ library);
-			NativePoreSupport.loadLibrary(library);
-			
-			
+			NativePoreSupport.loadLibrary();
 		}
 
 		@Override
@@ -94,9 +87,6 @@ public class HadoopStatsCmd extends Configured implements Tool {
 	public int run(String[] args) throws Exception {
 		Configuration conf = new Configuration();
 		
-		String lib = args[2];
-		System.out.println("*********************El argumento es:"+ lib);
-		conf.set("lib", lib);
 		Job job = new Job(conf, "hpg-pore-stats");
 		job.setJarByClass(HadoopStatsCmd.class);
 

@@ -1,33 +1,21 @@
 package org.opencb.hpg_pore;
 
-import java.io.File;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-
 public class NativePoreSupport {
+	public static final String LIB_NAME = "hpgpore";
 	public native String getFastqs(byte[] img);
 	public native String getInfo(byte[] img);
 	public native String getEvents(byte[] img, String src, int min, int max);
 	
-	public static void loadLibrary(String lib) {
-		System.out.println("-----> loading libs..");
-		String hostname;
-		if(lib == null){
-			
-			lib = System.getenv("LD_LIBRARY_PATH");
-			//lib = "/tmp/libopencb_pore.so";
-		}
-		File poreLib = new File(lib);
+	public static void loadLibrary() {
 		try {
-			hostname = InetAddress.getLocalHost().getHostName();
-		} catch (UnknownHostException e) {
-			hostname = new String("no-name");
+			System.loadLibrary(LIB_NAME);
+		} catch (UnsatisfiedLinkError e) {
+			String property = System.getProperty("java.library.path");
+			System.out.println("java.library.path = " + property);
+			System.out.println("Error loading dynamic library " + LIB_NAME +
+					", check your library is saved in " + property);
+			System.out.println("Set the environment variable LD_LIBRARY_PATH");
+			System.exit(-1);
 		}
-		if (poreLib.exists()) {
-			System.out.println("*********** " + poreLib.getAbsolutePath() + " exists (" + hostname + ")");
-		} else {
-			System.out.println("*********** " + poreLib.getAbsolutePath() + " does NOT exist (" + hostname + ")");				
-		}
-		System.load(poreLib.getAbsolutePath());		
 	}
 }

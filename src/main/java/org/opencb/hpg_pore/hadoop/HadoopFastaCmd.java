@@ -21,15 +21,10 @@ public class HadoopFastaCmd extends Configured implements Tool {
 	public static class Map extends Mapper<Text, BytesWritable, NullWritable, Text> {
 
 		private MultipleOutputs<NullWritable, Text> multipleOutputs = null; 
-		private String library;
+
 		@Override
 		public void setup(Context context) {
-			
-			Configuration conf = context.getConfiguration();
-			library = conf.get("lib",System.getenv("LD_LIBRARY_PATH"));
-			
-			NativePoreSupport.loadLibrary(library);
-
+			NativePoreSupport.loadLibrary();
 			multipleOutputs = new MultipleOutputs<NullWritable, Text>(context);
 		}
 
@@ -80,8 +75,7 @@ public class HadoopFastaCmd extends Configured implements Tool {
 	@Override
 	public int run(String[] args) throws Exception {
 		Configuration conf = new Configuration();
-		conf.set("lib", args[2]);
-		Job job = new Job(conf, "hadoop-pore-fasta");
+		Job job = new Job(conf, "hpg-pore-fasta");
 		job.setJarByClass(HadoopFastaCmd.class);
 
 		String srcFileName = args[0];

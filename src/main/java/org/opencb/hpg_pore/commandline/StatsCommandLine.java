@@ -3,18 +3,15 @@ package org.opencb.hpg_pore.commandline;
 import com.beust.jcommander.Parameter;
 
 public class StatsCommandLine {
-	 
-	  @Parameter(names = "--in", description = "Input folder (or file) where to find Fast5 files", required = true)
-	  private String in;
-	 
-	  @Parameter(names = "--out", description = "Output folder where to save statistics results and charts", required = true)
-	  private String out;
 
-	  @Parameter(names = "--hadoop", description = "Run the command on a Hadoop environment")
-	  private boolean isHadoop = false;
-	  
-	  @Parameter(names = "--lib", description = "Path where library is located")
-	  private String lib;
+	@Parameter(names = "--in", description = "Input folder (or file) where to find Fast5 files", required = true)
+	private String in;
+
+	@Parameter(names = "--out", description = "Output folder where to save statistics results and charts", required = true)
+	private String out;
+
+	@Parameter(names = "--hadoop", description = "Run the command on a Hadoop environment")
+	private boolean isHadoop = false;
 
 	public String getIn() {
 		return in;
@@ -38,11 +35,5 @@ public class StatsCommandLine {
 
 	public void setHadoop(boolean isHadoop) {
 		this.isHadoop = isHadoop;
-	}
-	public String getlib(){
-		return lib;
-	}
-	public void setlib(String lib){
-		this.lib = lib;
 	}
 }

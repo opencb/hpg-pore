@@ -35,14 +35,14 @@ public class ExportCmd {
 		}
 		outDir = cmdLine.getOut();
 		if (cmdLine.getfast5name() == null) {
-			runHadoopGetFiles(cmdLine.getin(),  cmdLine.getlib());
+			runHadoopGetFiles(cmdLine.getin());
 		} else {
-			runHadoopGetFile(cmdLine.getin(), cmdLine.getfast5name(), cmdLine.getlib());
+			runHadoopGetFile(cmdLine.getin(), cmdLine.getfast5name());
 		}
 		
 	}
 	
-	private static void runHadoopGetFiles(String in, String lib) throws IOException {	
+	private static void runHadoopGetFiles(String in) throws IOException {
 		Configuration conf = new Configuration();
 		FileSystem fs = FileSystem.get(conf);
 
@@ -51,7 +51,7 @@ public class ExportCmd {
 			System.exit(-1);			
 		}
 
-		NativePoreSupport.loadLibrary(lib);
+		NativePoreSupport.loadLibrary();
 
 		MapFile.Reader reader = null;
 
@@ -74,7 +74,7 @@ public class ExportCmd {
 		
 	
 	}
-	private static void runHadoopGetFile(String in, String nameFile, String lib) throws IOException {
+	private static void runHadoopGetFile(String in, String nameFile) throws IOException {
 		Configuration conf = new Configuration();
 		FileSystem fs = FileSystem.get(conf);
 
@@ -83,7 +83,7 @@ public class ExportCmd {
 			System.exit(-1);			
 		}
 
-		NativePoreSupport.loadLibrary(lib);
+		NativePoreSupport.loadLibrary();
 
 		MapFile.Reader reader = null;
 

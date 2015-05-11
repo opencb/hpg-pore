@@ -3,18 +3,15 @@ package org.opencb.hpg_pore.commandline;
 import com.beust.jcommander.Parameter;
 
 public class ImportCommandLine {
-	 
-	  @Parameter(names = "--in", description = "Input folder (or file) where to find Fast5 files", required = true)
-	  private String in;
-	 
-	  @Parameter(names = "--out", description = "Output HDFS Hadoop file where to save Fastq sequences", required = true)
-	  private String out;
-	  
-	  @Parameter(names = "--compress", description = "Compress the output HDFS Hadoop file")
-	  private boolean isCompression = false;
-	  
-	  @Parameter(names = "--lib", description = "Path where library is located")
-	  private String lib;
+
+	@Parameter(names = "--in", description = "Input folder (or file) where to find Fast5 files", required = true)
+	private String in;
+
+	@Parameter(names = "--out", description = "Output HDFS Hadoop file where to save Fastq sequences", required = true)
+	private String out;
+
+	@Parameter(names = "--compress", description = "Compress the output HDFS Hadoop file")
+	private boolean isCompression = false;
 
 	public String getIn() {
 		return in;
@@ -38,11 +35,5 @@ public class ImportCommandLine {
 
 	public void setIsCompression(boolean isCompression) {
 		this.isCompression = isCompression;
-	}
-	public String getlib(){
-		return lib;
-	}
-	public void setlib(String lib){
-		this.lib = lib;
 	}
 }

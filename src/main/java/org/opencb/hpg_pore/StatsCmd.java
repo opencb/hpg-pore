@@ -39,9 +39,9 @@ public class StatsCmd {
 		}
 
 		if (cmdLine.isHadoop()) {
-			runHadoopStatsCmd(cmdLine.getIn(), cmdLine.getOut(), cmdLine.getlib());
+			runHadoopStatsCmd(cmdLine.getIn(), cmdLine.getOut());
 		} else {
-			runLocalStatsCmd(cmdLine.getIn(), cmdLine.getOut(), cmdLine.getlib());
+			runLocalStatsCmd(cmdLine.getIn(), cmdLine.getOut());
 		}		
 	}
 
@@ -50,14 +50,14 @@ public class StatsCmd {
 	//-----------------------------------------------------------------------//
 
 
-	private static void runLocalStatsCmd(String in, String out, String lib) {	
+	private static void runLocalStatsCmd(String in, String out) {
 		File inFile = new File(in);
 		if (!inFile.exists()) {
 			System.out.println("Error: Local directory " + in + " does not exist!");
 			System.exit(-1);						
 		}
 
-		NativePoreSupport.loadLibrary(lib);
+		NativePoreSupport.loadLibrary();
 
 		// initialize PrintWriter map
 		HashMap<String, StatsWritable> statsMap = new HashMap<String, StatsWritable>();
@@ -161,7 +161,7 @@ public class StatsCmd {
 	//  hadoop stats command                                                 //
 	//-----------------------------------------------------------------------//
 
-	private static void runHadoopStatsCmd(String in, String out, String lib) throws Exception {
+	private static void runHadoopStatsCmd(String in, String out) throws Exception {
 		Configuration conf = new Configuration();
 		FileSystem fs = FileSystem.get(conf);
 
@@ -176,7 +176,6 @@ public class StatsCmd {
 		String[] args = new String[3];
 		args[0] = new String(in);
 		args[1] = new String(outHdfsDirname);
-		args[2] = new String(lib);
 
 		// map-reduce
 		int error = ToolRunner.run(new HadoopStatsCmd(), args);

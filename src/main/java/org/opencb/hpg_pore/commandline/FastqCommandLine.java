@@ -12,9 +12,6 @@ public class FastqCommandLine {
 
 	  @Parameter(names = "--hadoop", description = "Run the command on a Hadoop environment")
 	  private boolean isHadoop = false;
-	  
-	  @Parameter(names = "--lib", description = "Path where library is located")
-	  private String lib;
 
 	public String getIn() {
 		return in;
@@ -38,11 +35,5 @@ public class FastqCommandLine {
 
 	public void setHadoop(boolean isHadoop) {
 		this.isHadoop = isHadoop;
-	}
-	public String getlib(){
-		return lib;
-	}
-	public void setlib(String lib){
-		this.lib = lib;
 	}
 }

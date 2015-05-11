@@ -72,9 +72,9 @@ esac
 
 if [ $HADOOP -eq 1 ]; then
 	# echo "hadoop jar $@"
-	hadoop jar target/hpg-pore-0.1.0-jar-with-dependencies.jar $@ 
+	hadoop jar hpg-pore-0.1.0-jar-with-dependencies.jar $@
 else
 	# echo "java -jar $@"
-	java -jar target/hpg-pore-0.1.0-jar-with-dependencies.jar $@
+	java -jar hpg-pore-0.1.0-jar-with-dependencies.jar $@
 fi
 

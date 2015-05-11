@@ -39,9 +39,9 @@ public class FastaCmd {
 		}
 
 		if (cmdLine.isHadoop()) {
-			runHadoopFastaCmd(cmdLine.getIn(), cmdLine.getOut(), cmdLine.getlib());
+			runHadoopFastaCmd(cmdLine.getIn(), cmdLine.getOut());
 		} else {
-			runLocalFastaCmd(cmdLine.getIn(), cmdLine.getOut(), cmdLine.getlib());
+			runLocalFastaCmd(cmdLine.getIn(), cmdLine.getOut());
 		}		
 	}
 
@@ -50,7 +50,7 @@ public class FastaCmd {
 	//-----------------------------------------------------------------------//
 
 	
-	private static void runLocalFastaCmd(String in, String out, String lib) {	
+	private static void runLocalFastaCmd(String in, String out) {
 		File inFile = new File(in);
 		if (!inFile.exists()) {
 			System.out.println("Error: Local directory " + in + " does not exist!");
@@ -59,7 +59,7 @@ public class FastaCmd {
 
 		outDir = out;
 		
-		NativePoreSupport.loadLibrary(lib);
+		NativePoreSupport.loadLibrary();
 		
 		// initialize PrintWriter map
 		HashMap<String, PrintWriter> printers = new HashMap<String, PrintWriter>();
@@ -152,7 +152,7 @@ public class FastaCmd {
 	//  hadoop fasta command                                                 //
 	//-----------------------------------------------------------------------//
 
-	private static void runHadoopFastaCmd(String in, String out, String lib) throws Exception {
+	private static void runHadoopFastaCmd(String in, String out) throws Exception {
 		Configuration conf = new Configuration();
 		FileSystem fs = FileSystem.get(conf);
 
@@ -167,7 +167,6 @@ public class FastaCmd {
 		String[] args = new String[3];
 		args[0] = new String(in);
 		args[1] = new String(outHdfsDirname);
-		args[2] = new String(lib);
 
 		// map-reduce
 		int error = ToolRunner.run(new HadoopFastaCmd(), args);

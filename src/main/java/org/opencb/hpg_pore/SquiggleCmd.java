@@ -35,10 +35,10 @@ public class SquiggleCmd {
 		}
 		
 		if (cmdLine.isHadoop()) {
-			runHadoopSquiggleCmd(cmdLine.getin(), cmdLine.getfast5_name(),cmdLine.getOut(), cmdLine.getlib(), cmdLine.getmin() , cmdLine.getmax());
+			runHadoopSquiggleCmd(cmdLine.getin(), cmdLine.getfast5_name(),cmdLine.getOut(), cmdLine.getmin() , cmdLine.getmax());
 		} else {
 			
-			runLocalSquiggleCmd(cmdLine.getin(), cmdLine.getOut(), cmdLine.getlib(), cmdLine.getmin(), cmdLine.getmax());
+			runLocalSquiggleCmd(cmdLine.getin(), cmdLine.getOut(), cmdLine.getmin(), cmdLine.getmax());
 		}		
 	}
 
@@ -47,14 +47,14 @@ public class SquiggleCmd {
 	//-----------------------------------------------------------------------//
 
 
-	private static void runLocalSquiggleCmd(String in, String out, String lib, int min, int max) throws IOException {	
+	private static void runLocalSquiggleCmd(String in, String out, int min, int max) throws IOException {
 		File inFile = new File(in);
 		if (!inFile.exists()) {
 			System.out.println("Error: Local directory " + in + " does not exist!");
 			System.exit(-1);						
 		}
 
-		NativePoreSupport.loadLibrary(lib);
+		NativePoreSupport.loadLibrary();
 		int width = 1024;
 		int height = 480;
 		
@@ -147,9 +147,9 @@ public class SquiggleCmd {
 	//  hadoop squiggle command                                              //
 	//-----------------------------------------------------------------------//
 
-	private static void runHadoopSquiggleCmd(String in, String nameFile,String out, String lib, int min, int max) throws Exception {
+	private static void runHadoopSquiggleCmd(String in, String nameFile,String out, int min, int max) throws Exception {
 				
-		NativePoreSupport.loadLibrary(lib);
+		NativePoreSupport.loadLibrary();
 		int width = 1024;
 		int height = 480;
 		
