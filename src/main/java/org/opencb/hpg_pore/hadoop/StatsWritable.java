@@ -95,7 +95,7 @@ public class StatsWritable implements Writable {
 	public void draw(String runId, String out){
 		int width = 1024;
 		int height = 480;
-		String[] basics={"Template","Complement","2D"};
+		String[] basics={"Template", "Complement", "2D"};
 		BasicStats[] b = {this.sTemplate, this.sComplement, this.s2D};
 		
 		File outDir = new File(out + "/" + runId);
@@ -111,7 +111,7 @@ public class StatsWritable implements Writable {
 		***********************************/
 		JFreeChart chartRC = Utils.plotChannelChart(this.rChannelMap, "Number of reads per channel", "reads");
 		try {
-			Utils.saveChart(chartRC, width, height, out + "/" + runId + "/" + "_read_channel.jpg");
+			Utils.saveChart(chartRC, width, height, out + "/" + runId + "/" + "reads_per_channel.jpg");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -122,7 +122,7 @@ public class StatsWritable implements Writable {
 		***********************************/
 		JFreeChart chartYC = Utils.plotChannelChart(this.yChannelMap, "Number of nucleotides per channel", "nucleotides");
 		try {
-			Utils.saveChart(chartYC, width, height, out + "/" + runId + "/" + "_yield_channel.jpg");
+			Utils.saveChart(chartYC, width, height, out + "/" + runId + "/" + "yield_per_channel.jpg");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -134,11 +134,25 @@ public class StatsWritable implements Writable {
 			
 			JFreeChart chart = Utils.plotHistogram(b[i].lengthMap, "Read length histogram (" + basics[i] + ")", "read length", "frequency");
 			try {
-				Utils.saveChart(chart, width, height, out + "/" + runId + "/" + "_" + basics[i]+ "_read_length.jpg");
+				Utils.saveChart(chart, width, height, out + "/" + runId + "/" + basics[i]+ "_length_histogram.jpg");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
+
+		/*************************************
+		 * DRAW QUALITY_LENGTH - FREQUENCY
+		 ***********************************/
+		for (int i = 0; i< 3; i++){
+
+			JFreeChart chart = Utils.plotHistogram(b[i].qualMap, "Read quality histogram (" + basics[i] + ")", "read quality", "frequency");
+			try {
+				Utils.saveChart(chart, width, height, out + "/" + runId + "/" + basics[i]+ "_quality_histogram.jpg");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
 		/**********************************
 		* DRAW YIELD
 		***********************************/
@@ -166,7 +180,7 @@ public class StatsWritable implements Writable {
 			}
 			JFreeChart chart = Utils.plotXYChart(hist, "Per base sequence quality (" + basics[i] + ")",  "Position in read(bp) ", "Quality Scores");
 			try {
-				Utils.saveChart(chart, width, height, out + "/"+ runId + "/" + basics[i] + "_qualityperbase.jpg");
+				Utils.saveChart(chart, width, height, out + "/"+ runId + "/" + basics[i] + "_quality_per_pos.jpg");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -177,7 +191,7 @@ public class StatsWritable implements Writable {
 		for (int i = 0; i< 3; i++){
 			JFreeChart chart = Utils.plotNtContentChart(b[i].accumulators,"Per base sequence content("+ basics[i] + ")",  "Position in read(bp) ", "Sequence content");
 			try {
-				Utils.saveChart(chart, width, height, out + "/"+ runId + "/" + basics[i] + "_sequencecontent.jpg");
+				Utils.saveChart(chart, width, height, out + "/"+ runId + "/" + basics[i] + "_content_per_pos.jpg");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -188,7 +202,7 @@ public class StatsWritable implements Writable {
 		for (int i= 0; i< 3; i++){
 			JFreeChart chart = Utils.plotHistogramFloat(b[i].numgc, "Frequency - %GC("+ basics[i] + ")", "%GC", "Frequency");
 			try {
-				Utils.saveChart(chart, width, height, out + "/"+ runId + "/" + basics[i] + "_%GC.jpg");
+				Utils.saveChart(chart, width, height, out + "/"+ runId + "/" + basics[i] + "_GC_histogram.jpg");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -256,9 +270,10 @@ public class StatsWritable implements Writable {
 		public int numG;
 		public int numC;
 		public int numN;
-		public int meanqualitys;
-		
+		public int accQuality;
+
 		public HashMap<Integer, Integer> lengthMap;
+		public HashMap<Integer, Integer> qualMap;
 		public HashMap<Long, Integer> yieldMap;
 		public HashMap<Integer,ParamsforDraw> accumulators;
 		public HashMap<Float,Integer> numgc;
@@ -272,8 +287,9 @@ public class StatsWritable implements Writable {
 			numG = 0;
 			numC = 0;
 			numN = 0;
-			meanqualitys = 0;
+			accQuality = 0;
 			lengthMap = new HashMap<Integer, Integer>();
+			qualMap = new HashMap<Integer, Integer>();
 			yieldMap = new HashMap<Long, Integer>();
 			accumulators = new HashMap<Integer,ParamsforDraw>();
 			numgc = new HashMap<Float, Integer>();
@@ -292,12 +308,18 @@ public class StatsWritable implements Writable {
 			out.writeInt(minSeqLength);
 			out.writeInt(accSeqLength);
 			out.writeInt(maxSeqLength);
-			out.writeInt(meanqualitys);
+			out.writeInt(accQuality);
 
 			out.writeInt(lengthMap.size());
 			for(Object key:lengthMap.keySet()) {
 				out.writeInt((Integer) key);
 				out.writeInt((Integer) lengthMap.get(key));
+			}
+
+			out.writeInt(qualMap.size());
+			for(Object key:qualMap.keySet()) {
+				out.writeInt((Integer) key);
+				out.writeInt((Integer) qualMap.get(key));
 			}
 
 			out.writeInt(yieldMap.size());
@@ -333,7 +355,7 @@ public class StatsWritable implements Writable {
 			minSeqLength = in.readInt();
 			accSeqLength = in.readInt();
 			maxSeqLength = in.readInt();
-			meanqualitys = in.readInt();
+			accQuality = in.readInt();
 
 			int size;
 
@@ -341,6 +363,12 @@ public class StatsWritable implements Writable {
 			size = in.readInt();
 			for (int i = 0; i < size; i++) {
 				lengthMap.put(in.readInt(), in.readInt());
+			}
+
+			qualMap = new HashMap<Integer, Integer>();
+			size = in.readInt();
+			for (int i = 0; i < size; i++) {
+				qualMap.put(in.readInt(), in.readInt());
 			}
 
 			yieldMap = new HashMap<Long, Integer>();
@@ -377,7 +405,7 @@ public class StatsWritable implements Writable {
 				if (stats.maxSeqLength > maxSeqLength) maxSeqLength = stats.maxSeqLength;
 				accSeqLength += stats.accSeqLength;
 				
-				meanqualitys += stats.meanqualitys;
+				accQuality += stats.accQuality;
 				int v1 = 0;
 				for(Object key:stats.lengthMap.keySet()) {
 					v1 = stats.lengthMap.get((Integer) key);
@@ -387,13 +415,22 @@ public class StatsWritable implements Writable {
 					lengthMap.put((Integer) key, v1);
 				}
 
-				Integer v2 = 0;
-				for(Object key:stats.yieldMap.keySet()) {
-					v2 = stats.yieldMap.get((Long) key);
-					if (yieldMap.containsKey((Long) key)) {
-						v2 += yieldMap.get((Long) key);
+				v1 = 0;
+				for(Object key:stats.qualMap.keySet()) {
+					v1 = stats.qualMap.get((Integer) key);
+					if (qualMap.containsKey((Integer) key)) {
+						v1 += qualMap.get((Integer) key);
 					}
-					yieldMap.put((Long) key, v2);
+					qualMap.put((Integer) key, v1);
+				}
+
+				v1 = 0;
+				for(Object key:stats.yieldMap.keySet()) {
+					v1 = stats.yieldMap.get((Long) key);
+					if (yieldMap.containsKey((Long) key)) {
+						v1 += yieldMap.get((Long) key);
+					}
+					yieldMap.put((Long) key, v1);
 				}
 				 
 				for(Object key:stats.accumulators.keySet()) {
@@ -403,13 +440,14 @@ public class StatsWritable implements Writable {
 					}
 					accumulators.put((Integer) key, v3);
 				}
-				Integer v4 = 0;
+
+				v1 = 0;
 				for(Object key:stats.numgc.keySet()) {
-					v4 = stats.numgc.get((Float) key);
+					v1 = stats.numgc.get((Float) key);
 					if (numgc.containsKey((Float) key)) {
-						v4 += numgc.get((Float) key);
+						v1 += numgc.get((Float) key);
 					}
-					numgc.put((Float) key, v4);
+					numgc.put((Float) key, v1);
 				}
 				//System.out.println(this.toFormat());
 			}
@@ -433,12 +471,18 @@ public class StatsWritable implements Writable {
 				res += numG + "\n";
 				res += numC + "\n";
 				res += numN + "\n";
-				res += meanqualitys + "\n";
+				res += accQuality + "\n";
 				
 				res += lengthMap.size() + "\n";
 				
 				for(Object key:lengthMap.keySet()) {
 					res += ((Integer) key) + "\t" + ((Integer) lengthMap.get(key)) + "\n";
+				}
+
+				res += qualMap.size() + "\n";
+
+				for(Object key:qualMap.keySet()) {
+					res += ((Integer) key) + "\t" + ((Integer) qualMap.get(key)) + "\n";
 				}
 
 				res += yieldMap.size() + "\n";
@@ -477,12 +521,18 @@ public class StatsWritable implements Writable {
 				res += "N: " + numN + " " + String.format("%.2f", 100.0f * numN / length) + "%\n";
 
 				res += "GC: " + String.format("%.2f", 100.0f * (numG + numC) / length) + "% \n";
-				res += "Mean qualitys: " + meanqualitys +"\n"; 
+				res += "Mean quality: " + (accQuality / numSeqs) +"\n";
 				if (numSeqs > 1) {
 					res += "Read length histogram:\n";
 					res += "\tLength\tFrequency\n";
 					for(Object key:lengthMap.keySet()) {
 						res += "\t" + ((Integer) key) + "\t" + ((Integer) lengthMap.get(key)) + "\n";
+					}
+
+					res += "Read quality histogram:\n";
+					res += "\tQuality\tFrequency\n";
+					for(Object key:qualMap.keySet()) {
+						res += "\t" + ((Integer) key) + "\t" + ((Integer) qualMap.get(key)) + "\n";
 					}
 
 					res += "Cummulative yield:\n";
@@ -511,25 +561,29 @@ public class StatsWritable implements Writable {
 
 	
 		public String toSummary(){
-			String res = new String();
+			StringBuilder res = new StringBuilder();
 			int length = (numA + numT + numG + numC + numN);
 	
-			res += "\n Num. seqs: " + numSeqs + "\n";
+			res.append("\tNum. seqs: " + numSeqs + "\n");
 			if (numSeqs > 0) {
-				res += "Num. total nucleotides: " + length + " (" + accSeqLength + ")\n";
-				res += "Seq. length (min, avg, max) = (" + minSeqLength + ", " + String.format("%.2f", 1.0f * accSeqLength / numSeqs) + ", " + maxSeqLength + ")\n";
-				
-				res += "Nucleotides content";
-				res += "\tA: " + numA + " " + String.format("%.2f", 100.0f * numA / length) + "%, ";
-				res += "\tT: " + numT + " " + String.format("%.2f", 100.0f * numT / length) + "%, ";
-				res += "\tG: " + numG + " " + String.format("%.2f", 100.0f * numG / length) + "%, ";
-				res += "\tC: " + numC + " " + String.format("%.2f", 100.0f * numC / length) + "%, ";
-				res += "\tN: " + numN + " " + String.format("%.2f", 100.0f * numN / length) + "%\n";
-	
-				res += "GC: " + String.format("%.2f", 100.0f * (numG + numC) / length) + "% \n";
-				res += "Mean qualitys: " + meanqualitys/numSeqs +"\n"; 
+				res.append("\tNum. nucleotides: " + length + "\n");
+				res.append("\n");
+				res.append("\tMean read length: " + (length / numSeqs) + "\n");
+				res.append("\tMin. read length: " + minSeqLength + "\n");
+				res.append("\tMax. read length: " + maxSeqLength + "\n");
+				res.append("\n");
+				res.append("\tNucleotides content:\n");
+				res.append("\t\tA: " + numA + " (" + String.format("%.2f", 100.0f * numA / length) + " %)\n");
+				res.append("\t\tT: " + numT + " (" + String.format("%.2f", 100.0f * numT / length) + " %)\n");
+				res.append("\t\tG: " + numG + " (" + String.format("%.2f", 100.0f * numG / length) + " %)\n");
+				res.append("\t\tC: " + numC + " (" + String.format("%.2f", 100.0f * numC / length) + " %)\n");
+				res.append("\t\tN: " + numN + " (" + String.format("%.2f", 100.0f * numN / length) + " %)\n");
+				res.append("\n");
+				res.append("\t\tGC: " + String.format("%.2f", 100.0f * (numG + numC) / length) + " %\n");
+				res.append("\n");
+				res.append("\tMean read quality: " + (accQuality / numSeqs) + "\n");
 			}
-			return res;
+			return res.toString();
 		}
 	}
 	

@@ -442,20 +442,20 @@ public class Utils {
 	
 	public static String createSummaryFile(StatsWritable stats, String runId) throws Exception {
 		
-		String res = new String();
+		StringBuilder res = new StringBuilder();
 
-		res += "-----------------------------------------------------------------------\n";
-		res +=" Statistics for run " + runId;
-		res +="-----------------------------------------------------------------------\n";
+		res.append("-----------------------------------------------------------------------\n");
+		res.append(" Statistics for run " + runId + "\n");
+		res.append("-----------------------------------------------------------------------\n");
 		
-		res += "Template:";
-		res += stats.sTemplate.toSummary();
-		res += "Complement: ";
-		res += stats.sComplement.toSummary();
-		res += "2D: ";
-		res += stats.s2D.toSummary();
+		res.append("\nTemplate:\n");
+		res.append(stats.sTemplate.toSummary());
+		res.append("\nComplement:\n");
+		res.append(stats.sComplement.toSummary());
+		res.append("\n2D:\n");
+		res.append(stats.s2D.toSummary());
 				
-		return res;
+		return res.toString();
 	}
 	
 	
@@ -564,7 +564,7 @@ public class Utils {
 				// num. seqs
 				line = in.readLine();
 				int numSeqs = Integer.parseInt(line);
-				writer.println("\tNum. seqs: " + numSeqs);
+				writer.println("\n\tNum. seqs: " + numSeqs);
 
 				if (numSeqs > 0) {
 					// total length
@@ -617,10 +617,10 @@ public class Utils {
 					writer.println();
 					writer.println("\t\tGC: " + (100.0f * numGC / totalLength) + " %");
 
-					//mean qualitys
+					//mean read quality
 					line = in.readLine();
 					value = Integer.parseInt(line);
-					writer.println("\t \tMean qualitys: " +  value / numSeqs);
+					writer.println("\t \tMean read quality: " +  value / numSeqs);
 					
 					// plot: read length vs frequency
 					hist = new HashMap<Integer, Integer>();
@@ -775,7 +775,7 @@ public class Utils {
 		
 	}
 	
-	public static void countletters(String secuence, BasicStats basicstat){
+	public static void countletters(String sequence, BasicStats basicstat){
 		/*int count[] = new int [256];
 		for (int i = 0; i< secuence.length();i++)
 			count[secuence.charAt(i)]++;
@@ -789,18 +789,18 @@ public class Utils {
 		//int count[] = new int [256];
 		//System.out.println("********************** El tamaño de la secuencia es" + secuence.length());
 		
-		for (int i = 0; i< secuence.length();i++){
+		for (int i = 0; i< sequence.length();i++){
 			ParamsforDraw p = new ParamsforDraw();
-			if((secuence.charAt(i) == 'a')|| (secuence.charAt(i) == ('A'))){
+			if((sequence.charAt(i) == 'a')|| (sequence.charAt(i) == ('A'))){
 				basicstat.numA++;
 				p.numA++;
-			}else if((secuence.charAt(i) == 't') || (secuence.charAt(i) == ('T'))){
+			}else if((sequence.charAt(i) == 't') || (sequence.charAt(i) == ('T'))){
 				basicstat.numT++;
 				p.numT++;
-			}else if((secuence.charAt(i) == 'g') || (secuence.charAt(i) == ('G'))){
+			}else if((sequence.charAt(i) == 'g') || (sequence.charAt(i) == ('G'))){
 				basicstat.numG++;
 				p.numG++;
-			}else if((secuence.charAt(i) == 'c') || (secuence.charAt(i) == ('C'))){
+			}else if((sequence.charAt(i) == 'c') || (sequence.charAt(i) == ('C'))){
 				basicstat.numC++;
 				p.numC++;
 			}else {
@@ -810,19 +810,18 @@ public class Utils {
 			basicstat.accumulators.put(i, p);
 		}
 		basicstat.numSeqs++;
-		basicstat.accSeqLength = secuence.length();
-		basicstat.minSeqLength = secuence.length();
-		basicstat.maxSeqLength = secuence.length();
+		basicstat.accSeqLength = sequence.length();
+		basicstat.minSeqLength = sequence.length();
+		basicstat.maxSeqLength = sequence.length();
 		
-		basicstat.lengthMap.put(secuence.length(), 1);
+		basicstat.lengthMap.put(sequence.length(), 1);
 
-		float percent = (basicstat.numG+basicstat.numC)*100/secuence.length();
+		float percent = (basicstat.numG+basicstat.numC)*100/sequence.length();
 		basicstat.numgc.put(percent, 1);
 		
 		
 	}
 	public static void qualitycount(String quality, BasicStats basicstats){
-		
 		int media =0;
 		ParamsforDraw p = new ParamsforDraw();
 		for (int i = 0; i < quality.length();i++){
@@ -833,7 +832,8 @@ public class Utils {
 			basicstats.updateParams(basicstats,i,p);
 		}
 		media = media/quality.length(); 
-		basicstats.meanqualitys += media;
+		basicstats.accQuality += media;
+		basicstats.qualMap.put(media, 1);
 		
 	}
 	public static void updateTime(String timeStamp, BasicStats basicstats){
