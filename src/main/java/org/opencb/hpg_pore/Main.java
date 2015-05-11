@@ -63,7 +63,7 @@ public class Main {
 		System.out.println();
 		System.out.println("\timport    copy the Fast5 files into the Hadoop environment (a HDFS Hadoop file)");
 		System.out.println();
-		System.out.println("If you want to get back your Fast5 files imported to the Hadoop environment, use the command:e Hadoop file system by running the command:");
+		System.out.println("To get back your Fast5 files imported to the Hadoop environment, use the command:e Hadoop file system by running the command:");
 		System.out.println();
 		System.out.println("\texport   	copy back your Fast5 files in the local filesystem from the Hadoop environment");
 		System.out.println();
