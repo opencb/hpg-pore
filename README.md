@@ -2,7 +2,7 @@ HPG Pore README
 
 Welcome to HPG Pore !
 
-ONTACT
+CONTACT
 ------- 
   You can contact any of the following developers:
 
@@ -40,3 +40,5 @@ RUNING
 
     $ ./hpg-pore.sh -h
     
+
+A tutorial and further documentation are available at http://github.com/opencb/hpg-pore/wiki
