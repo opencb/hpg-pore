@@ -49,18 +49,4 @@ public class NativePoreSupport {
 			System.exit(-1);
 		}
 	}
-
-	public static void loadLibrary(String path) {
-		try {
-			System.load(path);
-		} catch (UnsatisfiedLinkError e) {
-			String property = System.getProperty("java.library.path");
-			System.out.println("java.library.path = " + property);
-			System.out.println("Error loading dynamic library " + LIB_NAME +
-					", check your library is saved in " + property);
-			System.out.println("Set the environment variable LD_LIBRARY_PATH");
-			System.exit(-1);
-		}
-	}
-
 }
