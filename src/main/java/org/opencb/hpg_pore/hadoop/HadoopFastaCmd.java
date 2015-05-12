@@ -39,8 +39,10 @@ public class HadoopFastaCmd extends Configured implements Tool {
 			System.out.println("***** map: key = " + key);
 
 			String info = new NativePoreSupport().getFastqs(value.getBytes());
-
-			if (info.length() <= 0) return;
+			if (info == null || info.length() <= 0) {
+				System.out.println("Error reading file . Maybe, the file is corrupt.");
+				return;
+			}
 
 			byte[] brLine = new byte[1];
 			brLine[0] = '\n';
@@ -78,11 +80,13 @@ public class HadoopFastaCmd extends Configured implements Tool {
 		Job job = new Job(conf, "hpg-pore-fasta");
 		job.setJarByClass(HadoopFastaCmd.class);
 
+		job.addCacheFile(new Path(NativePoreSupport.LIB_FULLNAME).toUri());
+
 		String srcFileName = args[0];
 		String outDirName = args[1];
 
 		// add input files to mapreduce processing
-		FileInputFormat.addInputPath(job, new Path(srcFileName));
+		FileInputFormat.addInputPath(job, new Path(srcFileName + "/data"));
 		job.setInputFormatClass(SequenceFileInputFormat.class);
 
 		// set output file

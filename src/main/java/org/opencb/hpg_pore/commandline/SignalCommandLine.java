@@ -19,10 +19,10 @@ public class SignalCommandLine {
 	@Parameter(names = "--max", description = "Max time for draw the graphic")
 	private int max;
 
-	@Parameter(names = "--fast5_name", description = "The old name of the fast5  the user want to use ")
-	private String fast5_name;
+	@Parameter(names = "--fast5name", description = "The old name of the fast5  the user want to use ")
+	private String fast5name;
 
-	public String getin() {
+	public String getIn() {
 		return in;
 	}
 
@@ -45,22 +45,22 @@ public class SignalCommandLine {
 	public void setHadoop(boolean isHadoop) {
 		this.isHadoop = isHadoop;
 	}
-	public void setmin(int min){
+	public void setMin(int min){
 		this.min = min;
 	}
-	public int getmin (){
+	public int getMin (){
 		return this.min;
 	}
-	public int getmax(){
+	public int getMax(){
 		return this.max;
 	}
-	public void setmax(int max){
+	public void setMax(int max){
 		this.max = max;
 	}
-	public String getfast5_name(){
-		return fast5_name;
+	public String getFast5name(){
+		return fast5name;
 	}
-	public void setfast5_name(String fast5_name){
-		this.fast5_name = fast5_name;
+	public void setFast5name(String fast5name){
+		this.fast5name = fast5name;
 	}
 }

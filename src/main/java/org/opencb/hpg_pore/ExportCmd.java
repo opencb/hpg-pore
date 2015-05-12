@@ -25,7 +25,7 @@ public class ExportCmd {
 
 		ExportCommandLine cmdLine = new ExportCommandLine();
 		JCommander cmd = new JCommander(cmdLine);
-		cmd.setProgramName(Main.BINARY_NAME + "export");
+		cmd.setProgramName(Main.BINARY_NAME + " export");
 
 		try {
 			cmd.parse(args);
@@ -34,10 +34,10 @@ public class ExportCmd {
 			System.exit(-1);
 		}
 		outDir = cmdLine.getOut();
-		if (cmdLine.getfast5name() == null) {
-			runHadoopGetFiles(cmdLine.getin());
+		if (cmdLine.getFast5name() == null) {
+			runHadoopGetFiles(cmdLine.getIn());
 		} else {
-			runHadoopGetFile(cmdLine.getin(), cmdLine.getfast5name());
+			runHadoopGetFile(cmdLine.getIn(), cmdLine.getFast5name());
 		}
 		
 	}

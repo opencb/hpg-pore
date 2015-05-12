@@ -31,15 +31,15 @@ public class HadoopStatsCmd extends Configured implements Tool {
 			//System.out.println("***** map: key = " + key);
 
 			String info = new NativePoreSupport().getInfo(value.getBytes());
-			String fastqs = new NativePoreSupport().getFastqs(value.getBytes());
-			Text runId = null;
-			StatsWritable stats = new StatsWritable();
-				
-			if (info == null) {
+			if (info == null || info.length() <= 0) {
 				System.out.println("Error reading file . Maybe, the file is corrupt.");
 				return;
 			}
-								
+
+			String fastqs = new NativePoreSupport().getFastqs(value.getBytes());
+			Text runId = null;
+			StatsWritable stats = new StatsWritable();
+
 			String name = Utils.getValue("run_id", info);
 			Utils.parseAndInitStats(info, fastqs, stats);
 			
@@ -89,6 +89,8 @@ public class HadoopStatsCmd extends Configured implements Tool {
 		
 		Job job = new Job(conf, "hpg-pore-stats");
 		job.setJarByClass(HadoopStatsCmd.class);
+
+		job.addCacheFile(new Path(NativePoreSupport.LIB_FULLNAME).toUri());
 
 		String srcFileName = args[0];
 		String outDirName = args[1];

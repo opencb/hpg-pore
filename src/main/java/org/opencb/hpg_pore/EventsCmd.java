@@ -39,9 +39,9 @@ public class EventsCmd {
 		}
 
 		if (cmdLine.isHadoop()) {
-			runHadoopEventsCmd(cmdLine.getin(), cmdLine.getOut(), cmdLine.getmin(), cmdLine.getmax());
+			runHadoopEventsCmd(cmdLine.getIn(), cmdLine.getFast5name(), cmdLine.getOut(), cmdLine.getMin(), cmdLine.getMax());
 		} else {
-			runLocalEventsCmd(cmdLine.getin(), cmdLine.getOut(), cmdLine.getmin(), cmdLine.getmax());
+			runLocalEventsCmd(cmdLine.getIn(), cmdLine.getOut(), cmdLine.getMin(), cmdLine.getMax());
 		}		
 	}
 
@@ -153,55 +153,51 @@ public class EventsCmd {
 	//  hadoop Events command                                              //
 	//-----------------------------------------------------------------------//
 
-	private static void runHadoopEventsCmd(String in, String out, int min, int max) throws Exception {
+	private static void runHadoopEventsCmd(String in, String fast5name, String out, int min, int max) throws Exception {
 		Configuration conf = new Configuration();
 		FileSystem fs = FileSystem.get(conf);
 
 		if (!fs.exists(new Path(in))) {
 			System.out.println("Error: Hdfs file " + in + " does not exist!");
-			System.exit(-1);			
+			System.exit(-1);
 		}
 
-		String outHdfsDirname = new String(in + "-" + new Date().getTime());
-		System.out.println(in + ", " + out + ", " + outHdfsDirname);
+		NativePoreSupport.loadLibrary();
 
-		String[] args = new String[3];
-		args[0] = new String(in);
-		args[1] = new String(outHdfsDirname);
+		String mapFilename = in;
 
-		// map-reduce
-		int error = ToolRunner.run(new HadoopFastqCmd(), args);
-		if (error != 0) {
-			System.out.println("Error: Running map-reduce job!");
-			System.exit(-1);			
-		}
+		byte content[];
+		String events = null;
 
-		// post-processing
-		String runId, mode, outLocalRunIdDirname;
+		String types[] = {"template", "complement", "2D"};
+		String namefiles[] = {"/template_events.txt", "/complement_events.txt","/2D_events.txt"};
 
-		String[] fields;
-		FileStatus[] status = fs.listStatus(new Path(outHdfsDirname));
-		for (int i=0; i<status.length; i++) {
-			fields = status[i].getPath().getName().split("-");
-			if (fields.length < 2) continue;
+		for (int i  = 0; i <3 ; i++ ) {
+			System.out.println("\n" + types[i] + ", reading " + in + ".....:\n");
+			content = Utils.readHadoop(mapFilename, fast5name);
+			if (content != null) {
+				events = new NativePoreSupport().getEvents(content, types[i], min, max);
+				if(events != null){
 
-			mode = fields[1];
-			if (mode.equalsIgnoreCase("te") || 
-					mode.equalsIgnoreCase("co") || 
-					mode.equalsIgnoreCase("2D")) {
-				runId = fields[0];
+					String sFichero = out +namefiles[i];
+					PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(sFichero, false)));
+					String[] linea;
+					String[] lineas = events.split("\n");
 
-				outLocalRunIdDirname = new String(out + "/" + runId);
-				File outDir = new File(outLocalRunIdDirname);
-				if (!outDir.exists()) {
-					outDir.mkdir();
+					for (int w = 0 ; w< lineas.length; w++){
+						linea = lineas[w].split("\t");
+						for (int j = 0; j<linea.length;j++){
+							writer.print(linea[j] + "\t");
+						}
+						writer.print("\n");
+					}
+					writer.close();
 				}
-				System.out.println("Copying " + Utils.toModeString(mode) + " sequences for run " + runId + " to the local file " + outLocalRunIdDirname + "/" + Utils.toModeString(mode) + ".fq");
-				fs.copyToLocalFile(status[i].getPath(), new Path(outLocalRunIdDirname + "/" + Utils.toModeString(mode) + ".fq"));
-				System.out.println("Done.");
+
+			} else {
+				System.out.println(types[i] +  " is empty !!! ");
 			}
 		}
-		fs.delete(new Path(outHdfsDirname), true);
 	}
 
 	//-----------------------------------------------------------------------//

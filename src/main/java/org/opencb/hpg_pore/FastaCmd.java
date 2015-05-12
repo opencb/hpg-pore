@@ -168,10 +168,12 @@ public class FastaCmd {
 			System.exit(-1);			
 		}
 
+		NativePoreSupport.checkLibrary(fs);
+
 		String outHdfsDirname = new String(in + "-" + new Date().getTime());
 		System.out.println(in + ", " + out + ", " + outHdfsDirname);
 
-		String[] args = new String[3];
+		String[] args = new String[2];
 		args[0] = new String(in);
 		args[1] = new String(outHdfsDirname);
 

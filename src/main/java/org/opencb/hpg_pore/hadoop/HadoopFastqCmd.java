@@ -1,9 +1,12 @@
 package org.opencb.hpg_pore.hadoop;
 
 import java.io.IOException;
+import java.net.URI;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
+import org.apache.hadoop.filecache.DistributedCache;
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.NullWritable;
@@ -39,8 +42,12 @@ public class HadoopFastqCmd extends Configured implements Tool {
 			System.out.println("***** map: key = " + key);
 
 			String info = new NativePoreSupport().getFastqs(value.getBytes());
+			if (info == null || info.length() <= 0) {
+				System.out.println("Error reading file . Maybe, the file is corrupt.");
+				return;
+			}
 
-			if (info.length() <= 0) return;
+			//String info = "run-2d\n@read1\nAAAA\n+\n2222";
 
 			byte[] brLine = new byte[1];
 			brLine[0] = '\n';
@@ -90,11 +97,13 @@ public class HadoopFastqCmd extends Configured implements Tool {
 		Job job = new Job(conf, "hpg-pore-fastq");
 		job.setJarByClass(HadoopFastqCmd.class);
 
+		job.addCacheFile(new Path(NativePoreSupport.LIB_FULLNAME).toUri());
+
 		String srcFileName = args[0];
 		String outDirName = args[1];
 
 		// add input files to mapreduce processing
-		FileInputFormat.addInputPath(job, new Path(srcFileName));
+		FileInputFormat.addInputPath(job, new Path(srcFileName + "/data"));
 		job.setInputFormatClass(SequenceFileInputFormat.class);
 
 		// set output file

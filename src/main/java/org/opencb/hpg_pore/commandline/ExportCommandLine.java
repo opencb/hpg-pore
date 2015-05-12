@@ -15,11 +15,11 @@ public class ExportCommandLine {
 	@Parameter(names = "--fast5name", description = "The old name of the fast5  the user want to use ", arity = 1, required = false)
 	private String fast5name = null;
 
-	public String getin() {
+	public String getIn() {
 		return in;
 	}
 
-	public void setin(String in) {
+	public void setIn(String in) {
 		this.in = in;
 	}
 
@@ -37,11 +37,11 @@ public class ExportCommandLine {
 	public boolean isHadoop() {
 		return isHadoop;
 	}
-	public String getfast5name(){
+	public String getFast5name(){
 		return fast5name;
 	}
 
-	public void setfast5_name(String fast5name){
+	public void setFast5name(String fast5name){
 		this.fast5name = fast5name;
 	}
 }

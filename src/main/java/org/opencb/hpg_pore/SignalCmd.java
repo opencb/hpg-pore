@@ -35,10 +35,9 @@ public class SignalCmd {
 		}
 		
 		if (cmdLine.isHadoop()) {
-			runHadoopSignalCmd(cmdLine.getin(), cmdLine.getfast5_name(), cmdLine.getOut(), cmdLine.getmin(), cmdLine.getmax());
+			runHadoopSignalCmd(cmdLine.getIn(), cmdLine.getFast5name(), cmdLine.getOut(), cmdLine.getMin(), cmdLine.getMax());
 		} else {
-			
-			runLocalSignalCmd(cmdLine.getin(), cmdLine.getOut(), cmdLine.getmin(), cmdLine.getmax());
+			runLocalSignalCmd(cmdLine.getIn(), cmdLine.getOut(), cmdLine.getMin(), cmdLine.getMax());
 		}		
 	}
 

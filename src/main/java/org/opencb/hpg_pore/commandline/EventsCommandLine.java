@@ -18,11 +18,14 @@ public class EventsCommandLine {
 	@Parameter(names = "--max", description = "Max time for stop the extrat events")
 	private int max;
 
-	public String getin() {
+	@Parameter(names = "--fast5name", description = "The old name of the fast5 the user want to use ")
+	private String fast5name;
+
+	public String getIn() {
 		return in;
 	}
 
-	public void setin(String in) {
+	public void setIn(String in) {
 		this.in = in;
 	}
 
@@ -41,16 +44,23 @@ public class EventsCommandLine {
 	public void setHadoop(boolean isHadoop) {
 		this.isHadoop = isHadoop;
 	}
-	public void setmin(int min){
+	public void setMin(int min){
 		this.min = min;
 	}
-	public int getmin (){
+	public int getMin (){
 		return this.min;
 	}
-	public int getmax(){
+	public int getMax(){
 		return this.max;
 	}
-	public void setmax(int max){
+	public void setMax(int max){
 		this.max = max;
+	}
+
+	public String getFast5name(){
+		return fast5name;
+	}
+	public void setFast5name(String fast5name){
+		this.fast5name = fast5name;
 	}
 }

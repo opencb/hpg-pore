@@ -52,12 +52,12 @@ case $COMMAND in
     ;;
     
   # hadoop commands
-  import)
+  import|fast5names|export)
   	HADOOP=1
   	;;
   
   # command commands (hadoop or local commands)
-  stats|fastq|fasta|signal|events|fast5names|export|version)
+  stats|fastq|fasta|signal|events|version)
   	for var in "$@"
 	do
     	if [ $var = "--hadoop" ]; then
