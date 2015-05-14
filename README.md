@@ -10,7 +10,7 @@ CONTACT
 ------- 
   You can contact any of the following developers:
 
-    * Joaquín Tárraga (jtarraga@gmail.es)
+    * Joaquín Tárraga (joaquintarraga@gmail.es)
     * Susi Gallego (sgaort@gmail)
     * Ignacio Medina (igmecas@gmail.es)
 
