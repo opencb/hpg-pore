@@ -2,6 +2,10 @@ HPG Pore README
 
 Welcome to HPG Pore !
 
+HPG Pore is a toolkit to explore and analyze **nanopore sequencing data** that can run both on a single computer and on the Hadoop distributed computing framework.
+
+HPG Pore allows efficient management of huge amounts of data, thus constituting a practical solution for the near future as well as a promising model for the development of new tools to deal with genomic big data.
+
 CONTACT
 ------- 
   You can contact any of the following developers:
@@ -18,6 +22,7 @@ To build the HPG Pore application you need to install in your system:
     * Java
     * Maven
     * gcc
+    * zlib
     * Hadoop (if you want HPG Pore to run on a Hadoop cluster)
 
 
