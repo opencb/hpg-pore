@@ -10,9 +10,9 @@ CONTACT
 ------- 
   You can contact any of the following developers:
 
-    * Joaquín Tárraga (joaquintarraga@gmail.es)
-    * Susi Gallego (sgaort@gmail)
-    * Ignacio Medina (igmecas@gmail.es)
+    * Joaquín Tárraga (jtarraga@cipf.es)
+    * Susi Gallego (agaor@alumni.uv.es)
+    * Ignacio Medina (im411@cam.ac.uk)
 
 REQUIREMENTS
 -------------
