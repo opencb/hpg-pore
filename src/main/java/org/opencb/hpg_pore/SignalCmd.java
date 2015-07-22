@@ -5,6 +5,7 @@ import java.io.File;
 
 import java.io.IOException;
 
+import java.text.NumberFormat;
 import java.util.HashMap;
 
 
@@ -56,7 +57,9 @@ public class SignalCmd {
 		NativePoreSupport.loadLibrary();
 		int width = 1024;
 		int height = 480;
-		
+
+		NumberFormat nf = NumberFormat.getInstance();
+
 		/*******************************
 		// T E M P L A T E
 		 *****************************/
@@ -78,8 +81,11 @@ public class SignalCmd {
 				linea = lineas[i].split("\t");
 				//System.out.println("linea[1]: "+ linea[1]+ "   linea[0]: "+linea[0]);
 				//if((Double.parseDouble(linea[0])- starttime) < max )
-				map.put(Double.parseDouble(linea[1]),Double.parseDouble(linea[0]));
-				
+				//map.put(Double.parseDouble(linea[1]),Double.parseDouble(linea[0]));
+				try {
+					map.put(nf.parse(linea[1]).doubleValue(), nf.parse(linea[0]).doubleValue());
+				} catch (Exception e) {
+				}
 			}
 		
 			JFreeChart chart = Utils.plotSignalChart(map, "Signal for template", "measured signal", "time");
@@ -103,7 +109,11 @@ public class SignalCmd {
 			for (int i = 1 ; i< lineas.length; i++){
 			//for (int i = 1 ; i< 200; i++){
 				linea = lineas[i].split("\t");
-				map.put(Double.parseDouble(linea[1]),Double.parseDouble(linea[0]));
+				//map.put(Double.parseDouble(linea[1]),Double.parseDouble(linea[0]));
+				try {
+					map.put(nf.parse(linea[1]).doubleValue(), nf.parse(linea[0]).doubleValue());
+				} catch (Exception e) {
+				}
 			}
 			JFreeChart chart = Utils.plotSignalChart(map, "Signal for Complement", "measured signal", "time");
 			Utils.saveChart(chart, width, height, out + "/complement_signal.jpg");
@@ -125,7 +135,11 @@ public class SignalCmd {
 			for (int i = 1 ; i< lineas.length; i++){
 				//for (int i = 1 ; i< 200; i++){
 				linea = lineas[i].split("\t");
-				map.put(Double.parseDouble(linea[1]),Double.parseDouble(linea[0]));
+				//map.put(Double.parseDouble(linea[1]),Double.parseDouble(linea[0]));
+				try {
+					map.put(nf.parse(linea[1]).doubleValue(), nf.parse(linea[0]).doubleValue());
+				} catch (Exception e) {
+				}
 			}
 	
 			JFreeChart chart = Utils.plotSignalChart(map, "Signal for 2D", "measured signal", "time");
@@ -134,10 +148,6 @@ public class SignalCmd {
 			
 			System.out.println("There is no 2D event type");
 		}
-	
-		
-		System.exit(0);
-
 	}
 
 	
@@ -151,8 +161,9 @@ public class SignalCmd {
 		NativePoreSupport.loadLibrary();
 		int width = 1024;
 		int height = 480;
-		
-		
+
+		NumberFormat nf = NumberFormat.getInstance();
+
 		/*******************************
 		// T E M P L A T E
 		 *****************************/
@@ -166,8 +177,11 @@ public class SignalCmd {
 			String[] lineas = events.split("\n");
 			for (int i = 1 ; i< lineas.length; i++){
 				linea = lineas[i].split("\t");
-				map.put(Double.parseDouble(linea[1]),Double.parseDouble(linea[0]));
-				
+				//map.put(Double.parseDouble(linea[1]),Double.parseDouble(linea[0]));
+				try {
+					map.put(nf.parse(linea[1]).doubleValue(), nf.parse(linea[0]).doubleValue());
+				} catch (Exception e) {
+				}
 			}
 		
 			JFreeChart chart = Utils.plotSignalChart(map, "Signal for template", "measured signal", "time");
@@ -176,7 +190,6 @@ public class SignalCmd {
 			
 			System.out.println("There is no template event type");
 		}
-		
 		/**********************************
 		// C O M P L E M E N T
 		 **********************************/
@@ -191,7 +204,11 @@ public class SignalCmd {
 			for (int i = 1 ; i< lineas.length; i++){
 
 				linea = lineas[i].split("\t");
-				map.put(Double.parseDouble(linea[1]),Double.parseDouble(linea[0]));
+				//map.put(Double.parseDouble(linea[1]),Double.parseDouble(linea[0]));
+				try {
+					map.put(nf.parse(linea[1]).doubleValue(), nf.parse(linea[0]).doubleValue());
+				} catch (Exception e) {
+				}
 			}
 			JFreeChart chart = Utils.plotSignalChart(map, "Signal for Complement", "measured signal", "time");
 			Utils.saveChart(chart, width, height, out + "/complement_signal.jpg");
@@ -213,7 +230,11 @@ public class SignalCmd {
 			for (int i = 1 ; i< lineas.length; i++){
 			
 				linea = lineas[i].split("\t");
-				map.put(Double.parseDouble(linea[1]),Double.parseDouble(linea[0]));
+				//map.put(Double.parseDouble(linea[1]),Double.parseDouble(linea[0]));
+				try {
+					map.put(nf.parse(linea[1]).doubleValue(), nf.parse(linea[0]).doubleValue());
+				} catch (Exception e) {
+				}
 			}
 	
 			JFreeChart chart = Utils.plotSignalChart(map, "Signal for 2D", "measured signal", "time");
@@ -222,11 +243,6 @@ public class SignalCmd {
 			
 			System.out.println("There is no 2D event type");
 		}
-	
-		
-		System.exit(0);
-		
-
 	}
 
 	//-----------------------------------------------------------------------//
