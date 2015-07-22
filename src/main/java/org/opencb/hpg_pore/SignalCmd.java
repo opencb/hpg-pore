@@ -157,7 +157,9 @@ public class SignalCmd {
 	//-----------------------------------------------------------------------//
 
 	private static void runHadoopSignalCmd(String in, String nameFile, String out, int min, int max) throws Exception {
-				
+
+		//NativePoreSupport.checkLibrary(fs);
+
 		NativePoreSupport.loadLibrary();
 		int width = 1024;
 		int height = 480;
