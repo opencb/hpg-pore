@@ -11,6 +11,8 @@ import java.util.HashMap;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.FileUtil;
+import org.apache.hadoop.fs.LocalFileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.util.ToolRunner;
 import org.opencb.hpg_pore.commandline.FastaCommandLine;
@@ -162,7 +164,8 @@ public class FastaCmd {
 	private static void runHadoopFastaCmd(String in, String out) throws Exception {
 		Configuration conf = new Configuration();
 		FileSystem fs = FileSystem.get(conf);
-
+		LocalFileSystem localFileSystem = fs.getLocal(conf);
+		
 		if (!fs.exists(new Path(in))) {
 			System.out.println("Error: Hdfs file " + in + " does not exist!");
 			System.exit(-1);			
@@ -191,12 +194,15 @@ public class FastaCmd {
 		FileStatus[] status = fs.listStatus(new Path(outHdfsDirname));
 		for (int i=0; i<status.length; i++) {
 			fields = status[i].getPath().getName().split("-");
+			System.out.println("filename = " + status[i].getPath().getName());
 			if (fields.length < 2) continue;
 
 			mode = fields[1];
-			if (mode.equalsIgnoreCase("te") || 
-					mode.equalsIgnoreCase("co") || 
+			if (mode.equalsIgnoreCase("te") ||
+					mode.equalsIgnoreCase("co") ||
 					mode.equalsIgnoreCase("2D")) {
+
+				System.out.println("processing....");
 				runId = fields[0];
 
 				outLocalRunIdDirname = new String(out + "/" + runId);
@@ -204,13 +210,30 @@ public class FastaCmd {
 				if (!outDir.exists()) {
 					outDir.mkdir();
 				}
-				System.out.println("Copying " + Utils.toModeString(mode) + " sequences for run " + runId + " to the local file " + outLocalRunIdDirname + "/" + Utils.toModeString(mode) + ".fa");
-				fs.copyToLocalFile(status[i].getPath(), new Path(outLocalRunIdDirname + "/" + Utils.toModeString(mode) + ".fa"));
-				System.out.println("Done.");
+
+
+				Path inputPath = new Path(outHdfsDirname + "/" + runId + "-" + mode);
+				File outFile = new File(outLocalRunIdDirname + "/" + Utils.toModeString(mode) + ".fa");
+
+				try {
+					if (outFile.exists()) {
+						outFile.delete();
+					}
+					System.out.println("Copying " + Utils.toModeString(mode) + " sequences for run " + runId + " to the local file " + outFile.getPath());
+					FileUtil.copyMerge(fs, inputPath, localFileSystem, new Path(outFile.getPath()), true, conf, "");
+				} catch (IOException ioe) {
+					System.out.println (ioe);
+				}
+
 			}
 		}
+
+
+		System.out.println("Done");
 		fs.delete(new Path(outHdfsDirname), true);
+
 	}
+
 
 	//-----------------------------------------------------------------------//
 	//-----------------------------------------------------------------------//

@@ -5,12 +5,16 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Hashtable;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.FileUtil;
+import org.apache.hadoop.fs.LocalFileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.util.ToolRunner;
 import org.opencb.hpg_pore.commandline.FastqCommandLine;
@@ -19,7 +23,7 @@ import org.opencb.hpg_pore.hadoop.HadoopFastqCmd;
 import com.beust.jcommander.JCommander;
 
 public class FastqCmd {
-	
+
 	public static String outDir;
 	//-----------------------------------------------------------------------//
 	// 	                     F A S T Q     C O M M A N D                     //
@@ -49,7 +53,7 @@ public class FastqCmd {
 	//  local fastq command                                                  //
 	//-----------------------------------------------------------------------//
 
-	
+
 	private static void runLocalFastqCmd(String in, String out) {
 		File inFile = new File(in);
 		if (!inFile.exists()) {
@@ -58,9 +62,9 @@ public class FastqCmd {
 		}
 
 		outDir = out;
-		
+
 		NativePoreSupport.loadLibrary();
-		
+
 		// initialize PrintWriter map
 		HashMap<String, PrintWriter> printers = new HashMap<String, PrintWriter>();
 
@@ -70,7 +74,7 @@ public class FastqCmd {
 		} else if (inFile.isFile()) {
 			processLocalFile(inFile, printers);
 		}
-		
+
 		// close printers
 		for (String name: printers.keySet()) {
 			printers.get(name).close();
@@ -78,9 +82,9 @@ public class FastqCmd {
 	}
 
 	//-----------------------------------------------------------------------//
-	
+
 	private static void writeToLocalFile(String name, String content, HashMap<String, PrintWriter> writers) throws IOException {
-		
+
 		PrintWriter writer = null;
 		if (!writers.containsKey(name)) {
 			String[] fields = name.split("-");
@@ -88,7 +92,7 @@ public class FastqCmd {
 			if (!auxFile.exists()) {
 				auxFile.mkdir();
 			}
-			
+
 			auxFile = new File(auxFile.getAbsolutePath() + "/" + Utils.toModeString(fields[1]) + ".fq");
 			writer = new PrintWriter(new BufferedWriter(new FileWriter(auxFile.getAbsolutePath(), false))); //true)));
 
@@ -97,11 +101,11 @@ public class FastqCmd {
 		writer = writers.get(name);
 		writer.print(content);		
 	}
-	
+
 	//-----------------------------------------------------------------------//
 
 	private static void processLocalFile(File inFile, HashMap<String, PrintWriter> printers) {
-		
+
 		String fastqs = null;
 		fastqs = new NativePoreSupport().getFastqs(Utils.read(inFile));		
 		//System.out.println(fastqs);
@@ -123,7 +127,7 @@ public class FastqCmd {
 			name = new String(line);
 
 			if (i + 1 >= lines.length) break;
-			
+
 			// second line: read ID
 			line = lines[i + 1];
 			content = new String(line + "\n");
@@ -131,7 +135,7 @@ public class FastqCmd {
 			// third line: nucleotides
 			line = lines[i + 2];
 			content = content.concat(line).concat("\n");
-			
+
 			// third line: nucleotides
 			line = lines[i + 3];
 			content = content.concat(line).concat("\n");
@@ -156,11 +160,11 @@ public class FastqCmd {
 		for (final File fileEntry : inDir.listFiles()) {
 			if (fileEntry.isDirectory()) {
 				processLocalDir(fileEntry, printers);
-	            //listFilesForFolder(fileEntry);
-	        } else {
-	        	processLocalFile(fileEntry, printers);
-	        }
-	    }
+				//listFilesForFolder(fileEntry);
+			} else {
+				processLocalFile(fileEntry, printers);
+			}
+		}
 	}
 
 	//-----------------------------------------------------------------------//
@@ -170,6 +174,7 @@ public class FastqCmd {
 	private static void runHadoopFastqCmd(String in, String out) throws Exception {
 		Configuration conf = new Configuration();
 		FileSystem fs = FileSystem.get(conf);
+		LocalFileSystem localFileSystem = fs.getLocal(conf);
 
 		if (!fs.exists(new Path(in))) {
 			System.out.println("Error: Hdfs file " + in + " does not exist!");
@@ -199,12 +204,15 @@ public class FastqCmd {
 		FileStatus[] status = fs.listStatus(new Path(outHdfsDirname));
 		for (int i=0; i<status.length; i++) {
 			fields = status[i].getPath().getName().split("-");
+			System.out.println("filename = " + status[i].getPath().getName());
 			if (fields.length < 2) continue;
 
 			mode = fields[1];
-			if (mode.equalsIgnoreCase("te") || 
-					mode.equalsIgnoreCase("co") || 
+			if (mode.equalsIgnoreCase("te") ||
+					mode.equalsIgnoreCase("co") ||
 					mode.equalsIgnoreCase("2D")) {
+
+				System.out.println("processing....");
 				runId = fields[0];
 
 				outLocalRunIdDirname = new String(out + "/" + runId);
@@ -212,14 +220,33 @@ public class FastqCmd {
 				if (!outDir.exists()) {
 					outDir.mkdir();
 				}
-				System.out.println("Copying " + Utils.toModeString(mode) + " sequences for run " + runId + " to the local file " + outLocalRunIdDirname + "/" + Utils.toModeString(mode) + ".fq");
-				fs.copyToLocalFile(status[i].getPath(), new Path(outLocalRunIdDirname + "/" + Utils.toModeString(mode) + ".fq"));
-				System.out.println("Done.");
+
+
+				Path inputPath = new Path(outHdfsDirname + "/" + runId + "-" + mode);
+				File outFile = new File(outLocalRunIdDirname + "/" + Utils.toModeString(mode) + ".fq");
+
+				try {
+					if (outFile.exists()) {
+						outFile.delete();
+					}
+					System.out.println("Copying " + Utils.toModeString(mode) + " sequences for run " + runId + " to the local file " + outFile.getPath());
+					FileUtil.copyMerge(fs, inputPath, localFileSystem, new Path(outFile.getPath()), true, conf, "");
+				} catch (IOException ioe) {
+					System.out.println (ioe);
+				}
+
 			}
 		}
+
+
+		System.out.println("Done");
 		fs.delete(new Path(outHdfsDirname), true);
+
 	}
+
+
 
 	//-----------------------------------------------------------------------//
 	//-----------------------------------------------------------------------//
 }
+
