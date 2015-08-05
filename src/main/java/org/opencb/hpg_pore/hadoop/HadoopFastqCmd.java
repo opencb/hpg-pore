@@ -39,14 +39,14 @@ public class HadoopFastqCmd extends Configured implements Tool {
 
 		@Override
 		public void map(Text key, BytesWritable value, Context context) throws IOException, InterruptedException {
-			System.out.println("***** map: key = " + key);
+			
 
 			String info = new NativePoreSupport().getFastqs(value.getBytes());
 			if (info == null || info.length() <= 0) {
-				System.out.println("Error reading file . Maybe, the file is corrupt.");
+				System.out.println("Could not read sequences from file "+ key + " . Maybe, the file does not contain any sequence or it is corrupt");
 				return;
 			}
-
+			System.out.println("File " + key + ". Processed.");
 			//String info = "run-2d\n@read1\nAAAA\n+\n2222";
 
 			byte[] brLine = new byte[1];
@@ -58,13 +58,13 @@ public class HadoopFastqCmd extends Configured implements Tool {
 
 			String line;
 
-			System.out.println("info length = " + info.length() + ", num.lines = " + lines.length);
+			//System.out.println("info length = " + info.length() + ", num.lines = " + lines.length);
 
 			for (int i = 0; i < lines.length; i += 5) {
 				// first line: runId & template/complement/2d				
 				line = lines[i];
-				System.out.println(i + " of " + lines.length + " : " + line);
-				name = new String(line);
+				//System.out.println(i + " of " + lines.length + " : " + line);
+				name = new String(line + "/file");
 
 				// second line: read ID
 				line = lines[i + 1];
